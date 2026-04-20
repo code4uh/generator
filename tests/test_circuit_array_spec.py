@@ -93,7 +93,10 @@ def test_invalid_cap_array_capabilities_placement_requires_fields() -> None:
     spec = load_example("cap_array.example.json")
     spec["capabilities"]["placement"] = {}
 
-    with pytest.raises(SpecValidationError, match="supported_algorithms"):
+    with pytest.raises(
+        SpecValidationError,
+        match="Schema validation failed at capabilities\\.placement: missing required property 'supported_algorithms'",
+    ):
         validate_spec(spec)
 
 
@@ -101,7 +104,10 @@ def test_invalid_res_array_capabilities_advanced_requires_supported_fields() -> 
     spec = load_example("res_array.example.json")
     spec["capabilities"]["advanced"].pop("supported_fields", None)
 
-    with pytest.raises(SpecValidationError, match="supported_fields"):
+    with pytest.raises(
+        SpecValidationError,
+        match="Schema validation failed at capabilities\\.advanced: missing required property 'supported_fields'",
+    ):
         validate_spec(spec)
 
 
@@ -109,7 +115,10 @@ def test_invalid_cap_array_extra_routing_option_field() -> None:
     spec = load_example("cap_array.example.json")
     spec["inputs"]["routing_options"]["unexpectedField"] = True
 
-    with pytest.raises(SpecValidationError, match="zusätzliche Felder"):
+    with pytest.raises(
+        SpecValidationError,
+        match="Schema validation failed at inputs\\.routing_options: additional properties not allowed",
+    ):
         validate_spec(spec)
 
 
@@ -117,7 +126,10 @@ def test_invalid_res_array_extra_advanced_field() -> None:
     spec = load_example("res_array.example.json")
     spec["inputs"]["advanced"]["unexpectedField"] = 1
 
-    with pytest.raises(SpecValidationError, match="zusätzliche Felder"):
+    with pytest.raises(
+        SpecValidationError,
+        match="Schema validation failed at inputs\\.advanced: additional properties not allowed",
+    ):
         validate_spec(spec)
 
 
@@ -125,7 +137,10 @@ def test_invalid_cap_array_boundary_caps_requires_valid_boundary_size() -> None:
     spec = load_example("cap_array.example.json")
     spec["inputs"]["topology"]["boundary_caps"]["boundary_size"] = "Large"
 
-    with pytest.raises(SpecValidationError, match="boundary_size"):
+    with pytest.raises(
+        SpecValidationError,
+        match="Schema validation failed at inputs\\.topology\\.boundary_caps\\.boundary_size: must be one of: 'Unit', 'Minimum'",
+    ):
         validate_spec(spec)
 
 
@@ -133,7 +148,10 @@ def test_invalid_res_array_boundary_resistors_requires_boolean_flags() -> None:
     spec = load_example("res_array.example.json")
     spec["inputs"]["topology"]["boundary_resistors"]["left"] = "yes"
 
-    with pytest.raises(SpecValidationError, match="boundary_resistors.left"):
+    with pytest.raises(
+        SpecValidationError,
+        match="Schema validation failed at inputs\\.topology\\.boundary_resistors\\.left: expected type boolean",
+    ):
         validate_spec(spec)
 
 
@@ -141,7 +159,10 @@ def test_invalid_cap_array_boundary_caps_missing_required_key() -> None:
     spec = load_example("cap_array.example.json")
     spec["inputs"]["topology"]["boundary_caps"].pop("top", None)
 
-    with pytest.raises(SpecValidationError, match="boundary_caps.top"):
+    with pytest.raises(
+        SpecValidationError,
+        match="Schema validation failed at inputs\\.topology\\.boundary_caps: missing required property 'top'",
+    ):
         validate_spec(spec)
 
 
@@ -150,7 +171,10 @@ def test_invalid_cap_array_user_pattern_must_be_array() -> None:
     spec["inputs"]["placement"]["algorithm"] = "user"
     spec["inputs"]["placement"]["pattern"] = "C1_1"
 
-    with pytest.raises(SpecValidationError, match="placement.pattern"):
+    with pytest.raises(
+        SpecValidationError,
+        match="Schema validation failed at inputs\\.placement\\.pattern: expected type array",
+    ):
         validate_spec(spec)
 
 
@@ -158,7 +182,10 @@ def test_invalid_cap_array_routing_options_type_check() -> None:
     spec = load_example("cap_array.example.json")
     spec["inputs"]["routing_options"]["nVias"] = "2"
 
-    with pytest.raises(SpecValidationError, match="routing_options.nVias"):
+    with pytest.raises(
+        SpecValidationError,
+        match="Schema validation failed at inputs\\.routing_options\\.nVias: expected type integer",
+    ):
         validate_spec(spec)
 
 
@@ -166,7 +193,10 @@ def test_invalid_res_array_advanced_field_type_check() -> None:
     spec = load_example("res_array.example.json")
     spec["inputs"]["advanced"]["onlyVerticalWires"] = "false"
 
-    with pytest.raises(SpecValidationError, match="advanced.onlyVerticalWires"):
+    with pytest.raises(
+        SpecValidationError,
+        match="Schema validation failed at inputs\\.advanced\\.onlyVerticalWires: expected type boolean",
+    ):
         validate_spec(spec)
 
 
@@ -174,5 +204,16 @@ def test_invalid_cap_array_guard_ring_options_structure() -> None:
     spec = load_example("cap_array.example.json")
     spec["inputs"]["routing_options"]["guardRingOptions"].pop("left", None)
 
-    with pytest.raises(SpecValidationError, match="guardRingOptions.left"):
+    with pytest.raises(
+        SpecValidationError,
+        match="Schema validation failed at inputs\\.routing_options\\.guardRingOptions: missing required property 'left'",
+    ):
+        validate_spec(spec)
+
+
+def test_invalid_cap_array_plus_connected_rejects_free_text() -> None:
+    spec = load_example("cap_array.example.json")
+    spec["inputs"]["topology"]["plusConnected"] = "(1, 2) free text"
+
+    with pytest.raises(SpecValidationError, match="invalid format"):
         validate_spec(spec)

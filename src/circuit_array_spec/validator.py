@@ -24,6 +24,39 @@ def _format_jsonschema_path(path: Any) -> str:
     return ".".join(str(item) for item in path)
 
 
+def _stable_jsonschema_summary(error: Any) -> str:
+    validator = getattr(error, "validator", "")
+
+    if validator == "additionalProperties":
+        return "additional properties not allowed"
+
+    if validator == "required":
+        missing_key = next(
+            (key for key in error.validator_value if key not in getattr(error, "instance", {})),
+            None,
+        )
+        if missing_key is None:
+            return "missing required property"
+        return f"missing required property '{missing_key}'"
+
+    if validator == "type":
+        expected_type = error.validator_value
+        if isinstance(expected_type, list):
+            expected = ", ".join(str(item) for item in expected_type)
+        else:
+            expected = str(expected_type)
+        return f"expected type {expected}"
+
+    if validator == "enum":
+        allowed = ", ".join(repr(item) for item in error.validator_value)
+        return f"must be one of: {allowed}"
+
+    if validator:
+        return f"{validator} constraint violated"
+
+    return "schema constraint violated"
+
+
 def _validate_schema(spec: dict[str, Any]) -> None:
     """Valdiere strikt per jsonschema Draft7 gegen die kanonische Schema-Datei."""
     try:
@@ -36,12 +69,19 @@ def _validate_schema(spec: dict[str, Any]) -> None:
     errors = sorted(Draft7Validator(_SCHEMA).iter_errors(spec), key=lambda item: list(item.absolute_path))
     if errors:
         error = errors[0]
+        path = _format_jsonschema_path(error.absolute_path)
+        summary = _stable_jsonschema_summary(error)
         raise SpecValidationError(
-            f"Schemafehler bei {_format_jsonschema_path(error.absolute_path)}: {error.message}"
+            f"Schema validation failed at {path}: {summary}"
         )
 
 
 def _parse_plus_connected(value: str) -> list[list[int]]:
+    if not re.fullmatch(r"\s*(\(\s*\d+(?:\s*,\s*\d+)*\s*\)\s*)+", value):
+        raise SpecValidationError(
+            "plusConnected has invalid format; expected only whitespace and groups like '(1, 2) (3, 4)'"
+        )
+
     groups: list[list[int]] = []
     for match in re.finditer(r"\(([^)]*)\)", value):
         inside = match.group(1)
