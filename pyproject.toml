@@ -9,7 +9,11 @@ description = "Parser, validation and derivation helpers for the Circuit Array S
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "Generator" }]
-dependencies = ["jsonschema>=4.0"]
+dependencies = [
+    "pydantic>=2.6,<3",
+    "jsonschema>=4.0",
+    "pytest-cov>=7.1.0",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
