@@ -1,0 +1,86 @@
+{
+  "version": "0.1",
+  "type": "cap_array",
+  "inputs": {
+    "topology": {
+      "cap_list": [
+        3,
+        4,
+        3,
+        2
+      ],
+      "connection": "userDefined",
+      "plusConnected": "(1, 2) (3, 4)",
+      "connectDummyCaps": "shorted_G1_p",
+      "boundary_caps": {
+        "left": true,
+        "right": true,
+        "top": false,
+        "bottom": true,
+        "boundary_size": "Unit"
+      }
+    },
+    "placement": {
+      "rows": 3,
+      "algorithm": "common_centroid",
+      "pattern": null
+    },
+    "dummy_caps": {
+      "naming_rule": "C0_<idx>"
+    },
+    "routing_options": {
+      "nVias": 2,
+      "wireWidthHor": 0.4,
+      "wireWidthVer": 0.4,
+      "wireWidthPlus": 0.6,
+      "wireWidthMinus": 0.6,
+      "truncVerWires": true,
+      "truncHorWires": false,
+      "verWireAssignment": "minus-plus",
+      "horWireAssignment": "symmetric",
+      "verShielding": "shield-pin",
+      "horShielding": "plus-minus",
+      "guardRingOptions": {
+        "left": true,
+        "right": true,
+        "top": true,
+        "bottom": false
+      },
+      "addGuardRingSpacing": 0.8
+    },
+    "advanced": {
+      "horDevSpacing": 0.2,
+      "verDevSpacing": 0.2,
+      "minHorDevBusSpacing": 0.15,
+      "minVerDevBusSpacing": 0.15,
+      "noRouting": false,
+      "onlyVerticalWires": false,
+      "omitHorizontalBus": false,
+      "deleteFloatingWires": true,
+      "wireSpaceHor": 0.1,
+      "wireSpaceVer": 0.1
+    }
+  },
+  "capabilities": {
+    "placement": {
+      "supported_algorithms": [
+        "common_centroid",
+        "side-by-side",
+        "side-by-side-row-wise",
+        "user"
+      ],
+      "pattern_supported": true
+    },
+    "routing": {
+      "level": "full"
+    },
+    "advanced": {
+      "level": "full"
+    },
+    "unsupported_option_policy": "ignore_with_warning"
+  },
+  "output": {
+    "libname": "my_library",
+    "cellname": "cap_array_cell"
+  }
+}
