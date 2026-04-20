@@ -139,7 +139,7 @@ def test_invalid_cap_array_boundary_caps_requires_valid_boundary_size() -> None:
 
     with pytest.raises(
         SpecValidationError,
-        match="Schema validation failed at inputs\\.topology\\.boundary_caps\\.boundary_size: must be one of: 'small', 'medium'",
+        match="Schema validation failed at inputs\\.topology\\.boundary_caps\\.boundary_size: must be one of: 'Unit', 'Minimum'",
     ):
         validate_spec(spec)
 
