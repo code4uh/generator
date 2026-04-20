@@ -1,81 +1,78 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.com/circuit-array-spec.schema.json",
   "title": "Circuit Array Specification",
-  "type": "object",
-  "required": [
-    "version",
-    "type",
-    "inputs",
-    "capabilities",
-    "output"
-  ],
-  "additionalProperties": false,
-  "properties": {
-    "version": {
-      "type": "string",
-      "enum": [
-        "0.1"
-      ]
-    },
-    "type": {
-      "type": "string",
-      "enum": [
-        "cap_array",
-        "res_array"
-      ]
-    },
-    "inputs": {
-      "type": "object"
-    },
-    "capabilities": {
-      "type": "object"
-    },
-    "output": {
-      "$ref": "#/definitions/output"
-    }
-  },
-  "allOf": [
+  "oneOf": [
     {
-      "if": {
-        "properties": {
-          "type": {
-            "const": "cap_array"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "inputs": {
-            "$ref": "#/definitions/capArrayInputs"
-          },
-          "capabilities": {
-            "$ref": "#/definitions/capArrayCapabilities"
-          }
+      "$ref": "#/$defs/CapArraySpec"
+    },
+    {
+      "$ref": "#/$defs/ResArraySpec"
+    }
+  ],
+  "$defs": {
+    "CapArraySpec": {
+      "type": "object",
+      "required": [
+        "version",
+        "type",
+        "inputs",
+        "capabilities",
+        "output"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string",
+          "enum": [
+            "0.1"
+          ]
+        },
+        "type": {
+          "const": "cap_array"
+        },
+        "inputs": {
+          "$ref": "#/$defs/capArrayInputs"
+        },
+        "capabilities": {
+          "$ref": "#/$defs/capArrayCapabilities"
+        },
+        "output": {
+          "$ref": "#/$defs/output"
         }
       }
     },
-    {
-      "if": {
-        "properties": {
-          "type": {
-            "const": "res_array"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "inputs": {
-            "$ref": "#/definitions/resArrayInputs"
-          },
-          "capabilities": {
-            "$ref": "#/definitions/resArrayCapabilities"
-          }
+    "ResArraySpec": {
+      "type": "object",
+      "required": [
+        "version",
+        "type",
+        "inputs",
+        "capabilities",
+        "output"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string",
+          "enum": [
+            "0.1"
+          ]
+        },
+        "type": {
+          "const": "res_array"
+        },
+        "inputs": {
+          "$ref": "#/$defs/resArrayInputs"
+        },
+        "capabilities": {
+          "$ref": "#/$defs/resArrayCapabilities"
+        },
+        "output": {
+          "$ref": "#/$defs/output"
         }
       }
-    }
-  ],
-  "definitions": {
+    },
     "output": {
       "type": "object",
       "required": [
@@ -218,7 +215,7 @@
           ]
         },
         "guardRingOptions": {
-          "$ref": "#/definitions/guardRingOptions"
+          "$ref": "#/$defs/guardRingOptions"
         },
         "addGuardRingSpacing": {
           "type": "number",
@@ -302,7 +299,7 @@
           "type": "boolean"
         },
         "boundary_size": {
-          "$ref": "#/definitions/boundarySize"
+          "$ref": "#/$defs/boundarySize"
         }
       }
     },
@@ -330,7 +327,7 @@
           "type": "boolean"
         },
         "boundary_size": {
-          "$ref": "#/definitions/boundarySize"
+          "$ref": "#/$defs/boundarySize"
         }
       }
     },
@@ -375,7 +372,7 @@
           ]
         },
         "boundary_caps": {
-          "$ref": "#/definitions/capBoundaryCaps"
+          "$ref": "#/$defs/capBoundaryCaps"
         }
       },
       "allOf": [
@@ -430,7 +427,7 @@
             "null"
           ],
           "items": {
-            "$ref": "#/definitions/capPlacementPatternRow"
+            "$ref": "#/$defs/capPlacementPatternRow"
           }
         }
       },
@@ -486,19 +483,19 @@
       "additionalProperties": false,
       "properties": {
         "topology": {
-          "$ref": "#/definitions/capTopology"
+          "$ref": "#/$defs/capTopology"
         },
         "placement": {
-          "$ref": "#/definitions/capPlacement"
+          "$ref": "#/$defs/capPlacement"
         },
         "dummy_caps": {
-          "$ref": "#/definitions/dummyCaps"
+          "$ref": "#/$defs/dummyCaps"
         },
         "routing_options": {
-          "$ref": "#/definitions/routingOptions"
+          "$ref": "#/$defs/routingOptions"
         },
         "advanced": {
-          "$ref": "#/definitions/advanced"
+          "$ref": "#/$defs/advanced"
         }
       }
     },
@@ -574,7 +571,7 @@
           }
         },
         "unsupported_option_policy": {
-          "$ref": "#/definitions/unsupportedOptionPolicy"
+          "$ref": "#/$defs/unsupportedOptionPolicy"
         }
       }
     },
@@ -608,7 +605,7 @@
           ]
         },
         "boundary_resistors": {
-          "$ref": "#/definitions/resBoundaryResistors"
+          "$ref": "#/$defs/resBoundaryResistors"
         }
       }
     },
@@ -654,19 +651,19 @@
       "additionalProperties": false,
       "properties": {
         "topology": {
-          "$ref": "#/definitions/resTopology"
+          "$ref": "#/$defs/resTopology"
         },
         "placement": {
-          "$ref": "#/definitions/resPlacement"
+          "$ref": "#/$defs/resPlacement"
         },
         "dummy_resistors": {
-          "$ref": "#/definitions/dummyResistors"
+          "$ref": "#/$defs/dummyResistors"
         },
         "routing_options": {
-          "$ref": "#/definitions/routingOptions"
+          "$ref": "#/$defs/routingOptions"
         },
         "advanced": {
-          "$ref": "#/definitions/advanced"
+          "$ref": "#/$defs/advanced"
         }
       }
     },
@@ -711,7 +708,7 @@
           "additionalProperties": false,
           "properties": {
             "level": {
-              "$ref": "#/definitions/routingLevel"
+              "$ref": "#/$defs/routingLevel"
             }
           }
         },
@@ -753,7 +750,7 @@
           }
         },
         "unsupported_option_policy": {
-          "$ref": "#/definitions/unsupportedOptionPolicy"
+          "$ref": "#/$defs/unsupportedOptionPolicy"
         }
       }
     }
