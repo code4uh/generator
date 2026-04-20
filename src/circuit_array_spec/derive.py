@@ -13,11 +13,15 @@ def expand_cap_devices(spec: dict[str, Any]) -> dict[str, list[str]]:
     return {"real": real_devices, "dummy": []}
 
 
-def derive_cap_grid(spec: dict[str, Any]) -> list[list[str]]:
-    """Leite ein Cap-Grid ab. Bei user-Algorithmus wird pattern direkt übernommen."""
+def derive_cap_grid(spec: dict[str, Any]) -> dict[str, Any]:
+    """Leite rows/cols + Grid für cap_array ab."""
     placement = spec["inputs"]["placement"]
+
     if placement["algorithm"] == "user":
-        return placement["pattern"]
+        grid = placement["pattern"]
+        rows = len(grid)
+        cols = max((len(row) for row in grid), default=0)
+        return {"rows": rows, "cols": cols, "grid": grid}
 
     rows = placement["rows"]
     real_devices = expand_cap_devices(spec)["real"]
@@ -37,7 +41,7 @@ def derive_cap_grid(spec: dict[str, Any]) -> list[list[str]]:
                 dummy_counter += 1
         grid.append(row)
 
-    return grid
+    return {"rows": rows, "cols": cols, "grid": grid}
 
 
 def expand_res_devices(spec: dict[str, Any]) -> dict[str, list[str]]:

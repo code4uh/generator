@@ -12,7 +12,7 @@ pip install -e .
 
 Die Validierung erfolgt in zwei Schritten:
 
-1. **JSON-Schema-Validierung** gegen `spec/circuit-array.schema.json`
+1. **JSON-Schema-Validierung** mit `jsonschema` gegen `spec/circuit-array.schema.json`
 2. **Semantische Validierung** für zusätzliche Fachregeln (z. B. `plusConnected`, `placement`-Regeln)
 
 ```python
@@ -37,11 +37,22 @@ from circuit_array_spec.derive import (
 )
 
 cap_devices = expand_cap_devices(cap_spec)
-cap_grid = derive_cap_grid(cap_spec)
+cap_grid = derive_cap_grid(cap_spec)  # enthält rows, cols, grid
 
 res_devices = expand_res_devices(res_spec)
 res_grid = derive_res_grid(res_spec)  # enthält rows, cols, grid
 ```
+
+
+## Aktueller Stand der Cap-Placement-Ableitung
+
+`derive_cap_grid()` unterscheidet aktuell nur zwischen:
+
+- `algorithm == "user"`: `placement.pattern` wird direkt übernommen
+- alle anderen Algorithmen (`common_centroid`, `side-by-side`, `side-by-side-row-wise`):
+  es wird eine generische zeilenweise Default-Platzierung erzeugt
+
+Das bedeutet: **die algorithmischen Unterschiede der drei Nicht-`user`-Algorithmen sind derzeit noch nicht separat implementiert**.
 
 ## Tests starten
 

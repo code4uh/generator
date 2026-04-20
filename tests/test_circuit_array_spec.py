@@ -3,6 +3,8 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("jsonschema")
+
 from circuit_array_spec.derive import (
     derive_cap_grid,
     derive_res_grid,
@@ -30,9 +32,11 @@ def test_valid_cap_array_example() -> None:
     assert expanded["real"][-1] == "C4_2"
     assert len(expanded["real"]) == 12
 
-    grid = derive_cap_grid(spec)
-    assert len(grid) == 3
-    assert all(len(row) == 4 for row in grid)
+    derived = derive_cap_grid(spec)
+    assert derived["rows"] == 3
+    assert derived["cols"] == 4
+    assert len(derived["grid"]) == 3
+    assert all(len(row) == 4 for row in derived["grid"])
 
 
 def test_valid_res_array_example() -> None:
@@ -82,4 +86,93 @@ def test_invalid_res_array_pattern_not_null() -> None:
     spec["inputs"]["placement"]["pattern"] = [["R1_1_1"]]
 
     with pytest.raises(SpecValidationError):
+        validate_spec(spec)
+
+
+def test_invalid_cap_array_capabilities_placement_requires_fields() -> None:
+    spec = load_example("cap_array.example.json")
+    spec["capabilities"]["placement"] = {}
+
+    with pytest.raises(SpecValidationError, match="supported_algorithms"):
+        validate_spec(spec)
+
+
+def test_invalid_res_array_capabilities_advanced_requires_supported_fields() -> None:
+    spec = load_example("res_array.example.json")
+    spec["capabilities"]["advanced"].pop("supported_fields", None)
+
+    with pytest.raises(SpecValidationError, match="supported_fields"):
+        validate_spec(spec)
+
+
+def test_invalid_cap_array_extra_routing_option_field() -> None:
+    spec = load_example("cap_array.example.json")
+    spec["inputs"]["routing_options"]["unexpectedField"] = True
+
+    with pytest.raises(SpecValidationError, match="zusätzliche Felder"):
+        validate_spec(spec)
+
+
+def test_invalid_res_array_extra_advanced_field() -> None:
+    spec = load_example("res_array.example.json")
+    spec["inputs"]["advanced"]["unexpectedField"] = 1
+
+    with pytest.raises(SpecValidationError, match="zusätzliche Felder"):
+        validate_spec(spec)
+
+
+def test_invalid_cap_array_boundary_caps_requires_valid_boundary_size() -> None:
+    spec = load_example("cap_array.example.json")
+    spec["inputs"]["topology"]["boundary_caps"]["boundary_size"] = "Large"
+
+    with pytest.raises(SpecValidationError, match="boundary_size"):
+        validate_spec(spec)
+
+
+def test_invalid_res_array_boundary_resistors_requires_boolean_flags() -> None:
+    spec = load_example("res_array.example.json")
+    spec["inputs"]["topology"]["boundary_resistors"]["left"] = "yes"
+
+    with pytest.raises(SpecValidationError, match="boundary_resistors.left"):
+        validate_spec(spec)
+
+
+def test_invalid_cap_array_boundary_caps_missing_required_key() -> None:
+    spec = load_example("cap_array.example.json")
+    spec["inputs"]["topology"]["boundary_caps"].pop("top", None)
+
+    with pytest.raises(SpecValidationError, match="boundary_caps.top"):
+        validate_spec(spec)
+
+
+def test_invalid_cap_array_user_pattern_must_be_array() -> None:
+    spec = load_example("cap_array.example.json")
+    spec["inputs"]["placement"]["algorithm"] = "user"
+    spec["inputs"]["placement"]["pattern"] = "C1_1"
+
+    with pytest.raises(SpecValidationError, match="placement.pattern"):
+        validate_spec(spec)
+
+
+def test_invalid_cap_array_routing_options_type_check() -> None:
+    spec = load_example("cap_array.example.json")
+    spec["inputs"]["routing_options"]["nVias"] = "2"
+
+    with pytest.raises(SpecValidationError, match="routing_options.nVias"):
+        validate_spec(spec)
+
+
+def test_invalid_res_array_advanced_field_type_check() -> None:
+    spec = load_example("res_array.example.json")
+    spec["inputs"]["advanced"]["onlyVerticalWires"] = "false"
+
+    with pytest.raises(SpecValidationError, match="advanced.onlyVerticalWires"):
+        validate_spec(spec)
+
+
+def test_invalid_cap_array_guard_ring_options_structure() -> None:
+    spec = load_example("cap_array.example.json")
+    spec["inputs"]["routing_options"]["guardRingOptions"].pop("left", None)
+
+    with pytest.raises(SpecValidationError, match="guardRingOptions.left"):
         validate_spec(spec)
