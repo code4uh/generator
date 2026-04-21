@@ -15,6 +15,7 @@ class LayoutValidator:
         issues: list[ValidationIssue] = []
         issues.extend(_validate_grid_dimensions(layout))
         issues.extend(_validate_id_integrity(normalized))
+        issues.extend(_validate_device_slots(normalized))
         issues.extend(_validate_devices(normalized))
         issues.extend(_validate_device_overlap(normalized))
         issues.extend(_validate_pins(layout))
@@ -44,7 +45,37 @@ def _validate_id_integrity(normalized: NormalizedLayout) -> list[ValidationIssue
         issues.append(
             _issue("DUPLICATE_WIRE_TILE_ID", "wireTile", wire_tile_id, ("wireTiles",), "wireTileId must be unique")
         )
+    for coord in normalized.duplicate_wire_tile_coords:
+        issues.append(
+            _issue(
+                "DUPLICATE_WIRE_TILE_COORD",
+                "wireTile",
+                None,
+                ("wireTiles",),
+                "max one wireTile per (x,y,layer)",
+                tile={"x": coord.x, "y": coord.y, "layer": coord.layer},
+            )
+        )
 
+    return issues
+
+
+def _validate_device_slots(normalized: NormalizedLayout) -> list[ValidationIssue]:
+    layout = normalized.layout
+    issues: list[ValidationIssue] = []
+    for slot in layout.device_slots:
+        issues.extend(
+            _validate_xy_layer_bounds(
+                x=slot.x,
+                y=slot.y,
+                from_layer=slot.from_layer,
+                to_layer=slot.to_layer,
+                layout=layout,
+                entity_type="deviceSlot",
+                entity_id=slot.slot_id,
+                location=("deviceSlots", slot.slot_id),
+            )
+        )
     return issues
 
 
@@ -53,6 +84,27 @@ def _validate_devices(normalized: NormalizedLayout) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
 
     for device in layout.devices:
+        if device.pin_grid.cells_x <= 0:
+            issues.append(
+                _issue(
+                    "PIN_GRID_DIMENSION",
+                    "device",
+                    device.device_id,
+                    ("devices", device.device_id, "pinGrid", "cellsX"),
+                    "pinGrid.cellsX must be > 0",
+                )
+            )
+        if device.pin_grid.cells_y <= 0:
+            issues.append(
+                _issue(
+                    "PIN_GRID_DIMENSION",
+                    "device",
+                    device.device_id,
+                    ("devices", device.device_id, "pinGrid", "cellsY"),
+                    "pinGrid.cellsY must be > 0",
+                )
+            )
+
         issues.extend(
             _validate_xy_layer_bounds(
                 x=device.x,
@@ -204,22 +256,8 @@ def _validate_pins(layout: LayoutInstance) -> list[ValidationIssue]:
 def _validate_wire_tiles(normalized: NormalizedLayout) -> list[ValidationIssue]:
     layout = normalized.layout
     issues: list[ValidationIssue] = []
-    seen_coords: set[TileCoord] = set()
 
     for tile in layout.wire_tiles:
-        coord = TileCoord(tile.x, tile.y, tile.layer)
-        if coord in seen_coords:
-            issues.append(
-                _issue(
-                    "DUPLICATE_WIRE_TILE_COORD",
-                    "wireTile",
-                    tile.wire_tile_id,
-                    ("wireTiles", tile.wire_tile_id),
-                    "max one wireTile per (x,y,layer)",
-                )
-            )
-        seen_coords.add(coord)
-
         if not _xy_layer_in_grid(tile.x, tile.y, tile.layer, tile.layer, layout):
             issues.append(
                 _issue(

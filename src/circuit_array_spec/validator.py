@@ -51,6 +51,21 @@ def _stable_jsonschema_summary(error: Any) -> str:
         allowed = ", ".join(repr(item) for item in error.validator_value)
         return f"must be one of: {allowed}"
 
+    if validator == "oneOf":
+        context = getattr(error, "context", ()) or ()
+        sub_summaries: list[str] = []
+        for sub_error in context:
+            sub_path = _format_jsonschema_path(getattr(sub_error, "absolute_path", ()))
+            sub_summary = _stable_jsonschema_summary(sub_error)
+            detail = f"{sub_path}: {sub_summary}" if sub_path != "<root>" else sub_summary
+            if detail not in sub_summaries:
+                sub_summaries.append(detail)
+            if len(sub_summaries) >= 3:
+                break
+        if sub_summaries:
+            return "must match exactly one schema; candidates failed: " + " | ".join(sub_summaries)
+        return "must match exactly one schema"
+
     if validator:
         return f"{validator} constraint violated"
 

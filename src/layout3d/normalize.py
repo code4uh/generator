@@ -52,12 +52,16 @@ def normalize_layout(layout: LayoutInstance) -> NormalizedLayout:
     wire_tile_by_coord: dict[TileCoord, WireTile] = {}
     wire_entries_by_coord: dict[TileCoord, tuple[WireEntry, ...]] = {}
     duplicate_wire_tile_ids: list[str] = []
+    duplicate_wire_tile_coords: list[TileCoord] = []
     seen_wire_tile_ids: set[str] = set()
 
     for wire_tile in wire_tiles:
         coord = TileCoord(wire_tile.x, wire_tile.y, wire_tile.layer)
-        wire_tile_by_coord[coord] = wire_tile
-        wire_entries_by_coord[coord] = wire_tile.ordered_wires
+        if coord in wire_tile_by_coord:
+            duplicate_wire_tile_coords.append(coord)
+        else:
+            wire_tile_by_coord[coord] = wire_tile
+            wire_entries_by_coord[coord] = wire_tile.ordered_wires
         if wire_tile.wire_tile_id in seen_wire_tile_ids:
             duplicate_wire_tile_ids.append(wire_tile.wire_tile_id)
         seen_wire_tile_ids.add(wire_tile.wire_tile_id)
@@ -73,6 +77,9 @@ def normalize_layout(layout: LayoutInstance) -> NormalizedLayout:
         duplicate_slot_ids=tuple(sorted(set(duplicate_slot_ids))),
         duplicate_device_ids=tuple(sorted(set(duplicate_device_ids))),
         duplicate_wire_tile_ids=tuple(sorted(set(duplicate_wire_tile_ids))),
+        duplicate_wire_tile_coords=tuple(
+            sorted(set(duplicate_wire_tile_coords), key=lambda c: (c.layer, c.y, c.x))
+        ),
     )
 
 

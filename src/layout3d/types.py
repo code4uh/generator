@@ -118,3 +118,4 @@ class NormalizedLayout:
     duplicate_slot_ids: tuple[str, ...] = ()
     duplicate_device_ids: tuple[str, ...] = ()
     duplicate_wire_tile_ids: tuple[str, ...] = ()
+    duplicate_wire_tile_coords: tuple[TileCoord, ...] = ()

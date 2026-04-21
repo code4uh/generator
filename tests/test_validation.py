@@ -33,3 +33,16 @@ def test_invalid_res_connect_dummy() -> None:
     spec = load_fixture("spec/fixtures/invalid/res_array_invalid_connect_dummy.json")
     with pytest.raises(SpecValidationError):
         validate_spec(spec)
+
+
+def test_oneof_error_includes_sub_causes() -> None:
+    pytest.importorskip("jsonschema")
+    spec = {
+        "version": "0.1",
+        "type": "cap_array",
+        "inputs": {},
+        "capabilities": {},
+        "output": {},
+    }
+    with pytest.raises(SpecValidationError, match="candidates failed"):
+        validate_spec(spec)
