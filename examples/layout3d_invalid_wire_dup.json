@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "templateRef": "tpl/wire-dup",
+  "grid": { "cellsX": 2, "cellsY": 2, "layers": 2 },
+  "deviceSlots": [],
+  "devices": [],
+  "wireTiles": [
+    {
+      "wireTileId": "wt1",
+      "x": 0,
+      "y": 0,
+      "layer": 0,
+      "orderedWires": [
+        {
+          "wireId": "w1",
+          "wireType": "sig",
+          "netId": "n1",
+          "orientation": "horizontal"
+        },
+        {
+          "wireId": "w1",
+          "wireType": "sig",
+          "netId": "n2",
+          "orientation": "vertical"
+        }
+      ]
+    }
+  ]
+}
