@@ -12,7 +12,7 @@ pip install -e .
 
 Die Validierung erfolgt in zwei Schritten:
 
-1. **JSON-Schema-Validierung** mit `jsonschema` gegen `spec/circuit-array.schema.json`
+1. **JSON-Schema-Validierung** mit `jsonschema` gegen `spec/schema/circuit-array.schema.json`
 2. **Semantische Validierung** für zusätzliche Fachregeln (z. B. `plusConnected`, `placement`-Regeln)
 
 ```python
@@ -21,7 +21,7 @@ from pathlib import Path
 
 from circuit_array_spec.validator import validate_spec
 
-spec = json.loads(Path("spec/examples/cap_array.example.json").read_text())
+spec = json.loads(Path("spec/templates/cap_array/v0.1.json").read_text())
 model = validate_spec(spec)
 print(type(model).__name__)
 ```

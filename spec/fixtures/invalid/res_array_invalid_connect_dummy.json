@@ -1,0 +1,82 @@
+{
+  "version": "0.1",
+  "type": "res_array",
+  "inputs": {
+    "topology": {
+      "res_list": [
+        1
+      ],
+      "parallelResNo": 1,
+      "connectDummyRes": "BAD",
+      "boundary_resistors": {
+        "left": false,
+        "right": false,
+        "top": false,
+        "bottom": false,
+        "boundary_size": "Unit"
+      }
+    },
+    "placement": {
+      "algorithm": "side-by-side",
+      "pattern": null
+    },
+    "dummy_resistors": {
+      "naming_rule": "R0_<idx>"
+    },
+    "routing_options": {
+      "nVias": 2,
+      "wireWidthHor": 0.4,
+      "wireWidthVer": 0.4,
+      "wireWidthPlus": 0.6,
+      "wireWidthMinus": 0.6,
+      "truncVerWires": true,
+      "truncHorWires": false,
+      "verWireAssignment": "minus-plus",
+      "horWireAssignment": "symmetric",
+      "verShielding": "shield-pin",
+      "horShielding": "plus-minus",
+      "guardRingOptions": {
+        "left": true,
+        "right": true,
+        "top": true,
+        "bottom": false
+      },
+      "addGuardRingSpacing": 0.8
+    },
+    "advanced": {
+      "horDevSpacing": 0.2,
+      "verDevSpacing": 0.2,
+      "minHorDevBusSpacing": 0.15,
+      "minVerDevBusSpacing": 0.15,
+      "noRouting": false,
+      "onlyVerticalWires": false,
+      "omitHorizontalBus": false,
+      "deleteFloatingWires": true,
+      "wireSpaceHor": 0.1,
+      "wireSpaceVer": 0.1
+    }
+  },
+  "capabilities": {
+    "placement": {
+      "supported_algorithms": [
+        "side-by-side"
+      ],
+      "pattern_supported": false
+    },
+    "routing": {
+      "level": "partial"
+    },
+    "advanced": {
+      "level": "partial",
+      "supported_fields": [
+        "horDevSpacing",
+        "verDevSpacing"
+      ]
+    },
+    "unsupported_option_policy": "ignore_with_warning"
+  },
+  "output": {
+    "libname": "lib",
+    "cellname": "res"
+  }
+}
