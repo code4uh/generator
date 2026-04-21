@@ -21,7 +21,7 @@ from pathlib import Path
 
 from circuit_array_spec.validator import validate_spec
 
-spec = json.loads(Path("spec/templates/cap_array/v0.1.json").read_text())
+spec = json.loads(Path("examples/json/cap_array_v0_1.json").read_text())
 model = validate_spec(spec)
 print(type(model).__name__)
 ```
@@ -110,7 +110,7 @@ import json
 from layout3d import parse_layout
 from layout3d.render import build_render_view, render_ascii, render_png_layers
 
-data = json.loads(Path("examples/simple_layout.json").read_text())
+data = json.loads(Path("examples/json/simple_layout.json").read_text())
 layout = parse_layout(data)
 view = build_render_view(layout)
 
@@ -123,5 +123,5 @@ render_png_layers(view, output_dir=Path("out/render"), prefix="simple")
 Kleiner CLI-Demo-Einstiegspunkt:
 
 ```bash
-PYTHONPATH=src python -m layout3d.render_demo examples/simple_layout.json --ascii-mode detailed --png-out out/render
+PYTHONPATH=src python -m layout3d.render_demo examples/json/simple_layout.json --ascii-mode detailed --png-out out/render
 ```

@@ -21,7 +21,7 @@ def _load_layout(rel_path: str):
 
 
 def test_ascii_compact_snapshot_minimal_layout() -> None:
-    layout = _load_layout("examples/layout3d_valid_minimal.json")
+    layout = _load_layout("examples/json/layout3d_valid_minimal.json")
     view = build_render_view(layout)
 
     rendered = render_ascii(view, mode="compact")
@@ -43,7 +43,7 @@ def test_ascii_compact_snapshot_minimal_layout() -> None:
 
 
 def test_ascii_detailed_snapshot_minimal_layout() -> None:
-    layout = _load_layout("examples/layout3d_valid_minimal.json")
+    layout = _load_layout("examples/json/layout3d_valid_minimal.json")
     view = build_render_view(layout)
 
     rendered = render_ascii(view, mode="detailed")
@@ -163,7 +163,7 @@ def test_render_png_layers_smoke_with_wire_orientation_markers(tmp_path: Path) -
 
 
 def test_build_render_view_maps_pins_to_pin_tile_layer_for_multilayer_device() -> None:
-    layout = _load_layout("examples/complex_layout.json")
+    layout = _load_layout("examples/json/complex_layout.json")
     view = build_render_view(layout)
 
     layer0_cell = view.by_layer[0].cells[(1, 1)]
@@ -184,7 +184,7 @@ def test_build_render_view_maps_pins_to_pin_tile_layer_for_multilayer_device() -
 def test_render_png_layers_smoke(tmp_path: Path) -> None:
     pytest.importorskip("PIL")
 
-    layout = _load_layout("examples/simple_layout.json")
+    layout = _load_layout("examples/json/simple_layout.json")
     view = build_render_view(layout)
 
     paths = render_png_layers(view, output_dir=tmp_path, prefix="simple", tile_size=48, draw_ports=True)
@@ -199,7 +199,7 @@ def test_render_png_layers_smoke(tmp_path: Path) -> None:
 def test_render_png_stacked_vertical_smoke(tmp_path: Path) -> None:
     pil_image = pytest.importorskip("PIL.Image")
 
-    layout = _load_layout("examples/simple_layout.json")
+    layout = _load_layout("examples/json/simple_layout.json")
     view = build_render_view(layout)
     out_path = tmp_path / "stacked_vertical.png"
 
@@ -225,7 +225,7 @@ def test_render_png_stacked_vertical_smoke(tmp_path: Path) -> None:
 def test_render_png_stacked_legend_fits_small_grid(tmp_path: Path) -> None:
     pil_image = pytest.importorskip("PIL.Image")
 
-    layout = _load_layout("examples/layout3d_valid_minimal.json")
+    layout = _load_layout("examples/json/layout3d_valid_minimal.json")
     view = build_render_view(layout)
     out_path = tmp_path / "stacked_with_legend.png"
 
@@ -246,7 +246,7 @@ def test_render_png_stacked_legend_fits_small_grid(tmp_path: Path) -> None:
 def test_render_png_stacked_horizontal_smoke(tmp_path: Path) -> None:
     pil_image = pytest.importorskip("PIL.Image")
 
-    layout = _load_layout("examples/complex_layout.json")
+    layout = _load_layout("examples/json/complex_layout.json")
     view = build_render_view(layout)
     out_path = tmp_path / "stacked_horizontal.png"
 
@@ -344,7 +344,7 @@ def test_render_demo_cli_writes_layer_pngs_and_stacked_png(tmp_path: Path) -> No
 
     out_dir = tmp_path / "layers"
     stacked = tmp_path / "stacked.png"
-    layout = ROOT / "examples" / "simple_layout.json"
+    layout = ROOT / "examples" / "json" / "simple_layout.json"
 
     subprocess.run(
         [
@@ -384,7 +384,7 @@ def test_render_demo_cli_writes_html_gallery_when_png_out_is_set(tmp_path: Path)
 
     out_dir = tmp_path / "layers"
     out_html = tmp_path / "gallery" / "layers.html"
-    layout = ROOT / "examples" / "simple_layout.json"
+    layout = ROOT / "examples" / "json" / "simple_layout.json"
 
     subprocess.run(
         [
@@ -422,7 +422,7 @@ def test_render_demo_cli_writes_html_with_optional_stacked_image(tmp_path: Path)
     out_dir = tmp_path / "layers"
     stacked = tmp_path / "stacked" / "demo_stacked.png"
     out_html = tmp_path / "gallery" / "layers.html"
-    layout = ROOT / "examples" / "simple_layout.json"
+    layout = ROOT / "examples" / "json" / "simple_layout.json"
 
     subprocess.run(
         [
@@ -464,7 +464,7 @@ def test_render_demo_cli_only_stacked_out_writes_no_layer_pngs(tmp_path: Path) -
     env["PYTHONPATH"] = str(src_dir) if "PYTHONPATH" not in env else f"{src_dir}:{env['PYTHONPATH']}"
 
     stacked = tmp_path / "stacked_only.png"
-    layout = ROOT / "examples" / "simple_layout.json"
+    layout = ROOT / "examples" / "json" / "simple_layout.json"
 
     subprocess.run(
         [
