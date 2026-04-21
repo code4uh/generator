@@ -61,7 +61,10 @@ def build_render_view(layout: LayoutInstance) -> LayoutRenderView:
         for layer in range(device.from_layer, device.to_layer + 1):
             coord = TileCoord(x=device.x, y=device.y, layer=layer)
             device_by_coord[coord] = (device.device_id, device.device_type)
-            pin_views = [
+
+        for pin in device.pins:
+            coord = pin.tile
+            pins_by_coord.setdefault(coord, []).append(
                 RenderPinView(
                     pin_id=pin.pin_id,
                     local_px=pin.local_pos.px,
@@ -70,10 +73,10 @@ def build_render_view(layout: LayoutInstance) -> LayoutRenderView:
                     pin_grid_y=device.pin_grid.cells_y,
                     ports=pin.attachment.ports,
                 )
-                for pin in device.pins
-            ]
-            pin_views.sort(key=lambda p: p.pin_id)
-            pins_by_coord[coord] = pin_views
+            )
+
+    for pin_views in pins_by_coord.values():
+        pin_views.sort(key=lambda p: p.pin_id)
 
     wires_by_coord: dict[TileCoord, tuple[WireEntry, ...]] = {}
     for wire_tile in layout.wire_tiles:
