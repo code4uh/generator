@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "templateRef": "tpl/demo-complex",
+  "grid": { "cellsX": 6, "cellsY": 5, "layers": 4 },
+  "deviceSlots": [
+    {
+      "slotId": "slotCtrl",
+      "allowedDeviceTypes": ["controller"],
+      "x": 1,
+      "y": 1,
+      "fromLayer": 0,
+      "toLayer": 3
+    },
+    {
+      "slotId": "slotAmp",
+      "allowedDeviceTypes": ["amp"],
+      "x": 3,
+      "y": 1,
+      "fromLayer": 1,
+      "toLayer": 2
+    },
+    {
+      "slotId": "slotMem",
+      "allowedDeviceTypes": ["memory"],
+      "x": 4,
+      "y": 3,
+      "fromLayer": 0,
+      "toLayer": 1
+    }
+  ],
+  "devices": [
+    {
+      "deviceId": "ctrl0",
+      "deviceType": "controller",
+      "slotId": "slotCtrl",
+      "x": 1,
+      "y": 1,
+      "fromLayer": 0,
+      "toLayer": 3,
+      "pinGrid": { "cellsX": 3, "cellsY": 3 },
+      "pins": [
+        {
+          "pinId": "ctrl_bus",
+          "tile": { "x": 1, "y": 1, "layer": 2 },
+          "localPos": { "px": 1, "py": 1 },
+          "attachment": {
+            "ports": [
+              { "side": "north", "pos_idx": 1 },
+              { "side": "south", "pos_idx": 1 }
+            ]
+          }
+        },
+        {
+          "pinId": "ctrl_sync",
+          "tile": { "x": 1, "y": 1, "layer": 0 },
+          "localPos": { "px": 2, "py": 0 },
+          "attachment": {
+            "ports": [{ "side": "east", "pos_idx": 2 }]
+          }
+        }
+      ]
+    },
+    {
+      "deviceId": "amp0",
+      "deviceType": "amp",
+      "slotId": "slotAmp",
+      "x": 3,
+      "y": 1,
+      "fromLayer": 1,
+      "toLayer": 2,
+      "pinGrid": { "cellsX": 2, "cellsY": 3 },
+      "pins": [
+        {
+          "pinId": "amp_in",
+          "tile": { "x": 3, "y": 1, "layer": 1 },
+          "localPos": { "px": 0, "py": 1 },
+          "attachment": {
+            "ports": [{ "side": "west", "pos_idx": 1 }]
+          }
+        },
+        {
+          "pinId": "amp_out",
+          "tile": { "x": 3, "y": 1, "layer": 2 },
+          "localPos": { "px": 1, "py": 1 },
+          "attachment": {
+            "ports": [
+              { "side": "east", "pos_idx": 1 },
+              { "side": "north", "pos_idx": 0 }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "deviceId": "mem0",
+      "deviceType": "memory",
+      "slotId": "slotMem",
+      "x": 4,
+      "y": 3,
+      "fromLayer": 0,
+      "toLayer": 1,
+      "pinGrid": { "cellsX": 2, "cellsY": 2 },
+      "pins": [
+        {
+          "pinId": "mem_data",
+          "tile": { "x": 4, "y": 3, "layer": 1 },
+          "localPos": { "px": 0, "py": 0 },
+          "attachment": {
+            "ports": [{ "side": "south", "pos_idx": 0 }]
+          }
+        }
+      ]
+    }
+  ],
+  "wireTiles": [
+    {
+      "wireTileId": "wt_ctrl_l0",
+      "x": 0,
+      "y": 1,
+      "layer": 0,
+      "orderedWires": [
+        {
+          "wireId": "w_ctrl_sync",
+          "wireType": "clk",
+          "netId": "net_sync",
+          "orientation": "horizontal"
+        }
+      ]
+    },
+    {
+      "wireTileId": "wt_bus_l1",
+      "x": 2,
+      "y": 1,
+      "layer": 1,
+      "orderedWires": [
+        {
+          "wireId": "w_bus_0",
+          "wireType": "sig",
+          "netId": "net_bus",
+          "orientation": "horizontal"
+        },
+        {
+          "wireId": "w_bus_1",
+          "wireType": "sig",
+          "netId": "net_bus_aux",
+          "orientation": "vertical"
+        }
+      ]
+    },
+    {
+      "wireTileId": "wt_bus_l2",
+      "x": 2,
+      "y": 2,
+      "layer": 2,
+      "orderedWires": [
+        {
+          "wireId": "w_amp_out",
+          "wireType": "sig",
+          "netId": "net_out",
+          "orientation": "vertical"
+        }
+      ]
+    },
+    {
+      "wireTileId": "wt_mem_l1",
+      "x": 5,
+      "y": 3,
+      "layer": 1,
+      "orderedWires": [
+        {
+          "wireId": "w_mem_data",
+          "wireType": "sig",
+          "netId": "net_mem",
+          "orientation": "horizontal"
+        }
+      ]
+    }
+  ]
+}
