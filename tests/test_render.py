@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from layout3d import parse_layout
-from layout3d.render import build_render_view, render_ascii, render_png_layers
+from layout3d.render import build_render_view, render_ascii, render_png_layers, render_png_stacked
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -100,3 +100,52 @@ def test_render_png_layers_smoke(tmp_path: Path) -> None:
         assert path.exists()
         assert path.suffix == ".png"
         assert path.stat().st_size > 0
+
+
+def test_render_png_stacked_vertical_smoke(tmp_path: Path) -> None:
+    pil_image = pytest.importorskip("PIL.Image")
+
+    layout = _load_layout("examples/simple_layout.json")
+    view = build_render_view(layout)
+    out_path = tmp_path / "stacked_vertical.png"
+
+    render_png_stacked(
+        view,
+        output_path=out_path,
+        tile_px=48,
+        stack_direction="vertical",
+        show_coords=True,
+        show_legend=True,
+    )
+
+    assert out_path.exists()
+    assert out_path.stat().st_size > 0
+
+    with pil_image.open(out_path) as image:
+        width, height = image.size
+
+    assert width > 0
+    assert height > width
+
+
+def test_render_png_stacked_horizontal_smoke(tmp_path: Path) -> None:
+    pil_image = pytest.importorskip("PIL.Image")
+
+    layout = _load_layout("examples/complex_layout.json")
+    view = build_render_view(layout)
+    out_path = tmp_path / "stacked_horizontal.png"
+
+    render_png_stacked(
+        view,
+        output_path=out_path,
+        tile_px=64,
+        stack_direction="horizontal",
+    )
+
+    assert out_path.exists()
+    assert out_path.stat().st_size > 0
+
+    with pil_image.open(out_path) as image:
+        width, height = image.size
+
+    assert width > height
