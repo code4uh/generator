@@ -51,6 +51,12 @@ class LayoutRenderView:
     by_layer: dict[int, RenderLayerView]
 
 
+@dataclass(frozen=True)
+class RenderDrawOptions:
+    draw_ports: bool = False
+    show_coords: bool = False
+
+
 def build_render_view(layout: LayoutInstance) -> LayoutRenderView:
     cells_x = layout.grid.cells_x
     cells_y = layout.grid.cells_y
@@ -184,6 +190,7 @@ def render_png_layers(
     prefix: str = "layout",
     tile_size: int = 72,
     draw_ports: bool = False,
+    show_coords: bool = False,
 ) -> list[Path]:
     try:
         from PIL import Image, ImageDraw
@@ -194,13 +201,20 @@ def render_png_layers(
     grid_pad = 20
     width = grid_pad * 2 + view.cells_x * tile_size
     height = grid_pad * 2 + view.cells_y * tile_size
+    options = RenderDrawOptions(draw_ports=draw_ports, show_coords=show_coords)
 
     paths: list[Path] = []
     for layer in view.layers:
         image = Image.new("RGB", (width, height), (255, 255, 255))
         draw = ImageDraw.Draw(image)
-        _draw_grid(draw, view, tile_size, grid_pad)
-        _draw_layer_cells(draw, view.by_layer[layer], tile_size, grid_pad, draw_ports)
+        draw_layer(
+            draw=draw,
+            layer_view=view.by_layer[layer],
+            x_offset=grid_pad,
+            y_offset=grid_pad,
+            tile_px=tile_size,
+            options=options,
+        )
 
         out_path = output_dir / f"{prefix}_layer{layer}.png"
         image.save(out_path)
@@ -209,27 +223,60 @@ def render_png_layers(
     return paths
 
 
-def _draw_grid(draw, view: LayoutRenderView, tile_size: int, pad: int) -> None:
-    x0 = pad
-    y0 = pad
-    x1 = pad + view.cells_x * tile_size
-    y1 = pad + view.cells_y * tile_size
+def draw_layer(
+    draw,
+    layer_view: RenderLayerView,
+    x_offset: int,
+    y_offset: int,
+    tile_px: int,
+    options: RenderDrawOptions,
+) -> None:
+    _draw_grid(
+        draw=draw,
+        cells_x=max((cell.x for cell in layer_view.cells.values()), default=-1) + 1,
+        cells_y=max((cell.y for cell in layer_view.cells.values()), default=-1) + 1,
+        tile_px=tile_px,
+        x_offset=x_offset,
+        y_offset=y_offset,
+    )
+    _draw_layer_cells(
+        draw=draw,
+        layer=layer_view,
+        tile_px=tile_px,
+        x_offset=x_offset,
+        y_offset=y_offset,
+        options=options,
+    )
+
+
+def _draw_grid(draw, cells_x: int, cells_y: int, tile_px: int, x_offset: int, y_offset: int) -> None:
+    x0 = x_offset
+    y0 = y_offset
+    x1 = x_offset + cells_x * tile_px
+    y1 = y_offset + cells_y * tile_px
     draw.rectangle((x0, y0, x1, y1), outline=(70, 70, 70), width=2)
 
-    for ix in range(view.cells_x + 1):
-        x = pad + ix * tile_size
+    for ix in range(cells_x + 1):
+        x = x_offset + ix * tile_px
         draw.line((x, y0, x, y1), fill=(180, 180, 180), width=1)
-    for iy in range(view.cells_y + 1):
-        y = pad + iy * tile_size
+    for iy in range(cells_y + 1):
+        y = y_offset + iy * tile_px
         draw.line((x0, y, x1, y), fill=(180, 180, 180), width=1)
 
 
-def _draw_layer_cells(draw, layer: RenderLayerView, tile_size: int, pad: int, draw_ports: bool) -> None:
+def _draw_layer_cells(
+    draw,
+    layer: RenderLayerView,
+    tile_px: int,
+    x_offset: int,
+    y_offset: int,
+    options: RenderDrawOptions,
+) -> None:
     for (x, y), cell in layer.cells.items():
-        left = pad + x * tile_size
-        top = pad + y * tile_size
-        right = left + tile_size
-        bottom = top + tile_size
+        left = x_offset + x * tile_px
+        top = y_offset + y * tile_px
+        right = left + tile_px
+        bottom = top + tile_px
 
         if cell.has_device:
             draw.rectangle((left + 2, top + 2, right - 2, bottom - 2), fill=(188, 224, 255))
@@ -237,12 +284,14 @@ def _draw_layer_cells(draw, layer: RenderLayerView, tile_size: int, pad: int, dr
             draw.rectangle((left + 8, top + 8, right - 8, bottom - 8), outline=(227, 126, 55), width=3)
 
         for pin in cell.pins:
-            px = left + int(((pin.local_px + 0.5) / pin.pin_grid_x) * tile_size)
-            py = top + int(((pin.local_py + 0.5) / pin.pin_grid_y) * tile_size)
-            r = max(2, tile_size // 14)
+            px = left + int(((pin.local_px + 0.5) / pin.pin_grid_x) * tile_px)
+            py = top + int(((pin.local_py + 0.5) / pin.pin_grid_y) * tile_px)
+            r = max(2, tile_px // 14)
             draw.ellipse((px - r, py - r, px + r, py + r), fill=(39, 97, 171), outline=(255, 255, 255))
-            if draw_ports:
-                _draw_ports(draw, left, top, tile_size, pin)
+            if options.draw_ports:
+                _draw_ports(draw, left, top, tile_px, pin)
+        if options.show_coords:
+            draw.text((left + 3, top + 3), f"({x},{y})", fill=(90, 90, 90))
 
 
 def _draw_ports(draw, left: int, top: int, tile_size: int, pin: RenderPinView) -> None:
@@ -263,6 +312,88 @@ def _draw_ports(draw, left: int, top: int, tile_size: int, pin: RenderPinView) -
         draw.ellipse((x - 2, y - 2, x + 2, y + 2), fill=(100, 100, 100))
 
 
+def render_png_stacked(
+    view: LayoutRenderView,
+    output_path: Path,
+    tile_px: int = 64,
+    stack_direction: str = "vertical",
+    draw_ports: bool = False,
+    show_coords: bool = False,
+    show_legend: bool = False,
+) -> Path:
+    try:
+        from PIL import Image, ImageDraw
+    except ModuleNotFoundError as exc:  # pragma: no cover - env dependent
+        raise RuntimeError("Pillow is required for PNG rendering") from exc
+
+    if stack_direction not in {"vertical", "horizontal"}:
+        raise ValueError("stack_direction must be one of: vertical, horizontal")
+
+    tile_block_w = view.cells_x * tile_px
+    tile_block_h = view.cells_y * tile_px
+    pad = 20
+    layer_gap = 16
+    header_h = max(20, tile_px // 2)
+    legend_h = max(70, tile_px + 20) if show_legend else 0
+
+    if stack_direction == "vertical":
+        width = pad * 2 + tile_block_w
+        height = (
+            pad * 2
+            + len(view.layers) * (header_h + tile_block_h)
+            + max(0, len(view.layers) - 1) * layer_gap
+            + legend_h
+        )
+    else:
+        width = (
+            pad * 2
+            + len(view.layers) * tile_block_w
+            + max(0, len(view.layers) - 1) * layer_gap
+        )
+        height = pad * 2 + header_h + tile_block_h + legend_h
+
+    image = Image.new("RGB", (width, height), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    options = RenderDrawOptions(draw_ports=draw_ports, show_coords=show_coords)
+
+    for idx, layer in enumerate(view.layers):
+        if stack_direction == "vertical":
+            x = pad
+            y = pad + idx * (header_h + tile_block_h + layer_gap)
+        else:
+            x = pad + idx * (tile_block_w + layer_gap)
+            y = pad
+
+        draw.text((x, y), f"Layer {layer}", fill=(0, 0, 0))
+        draw_layer(
+            draw=draw,
+            layer_view=view.by_layer[layer],
+            x_offset=x,
+            y_offset=y + header_h,
+            tile_px=tile_px,
+            options=options,
+        )
+
+    if show_legend:
+        legend_x = pad
+        legend_y = height - pad - legend_h
+        _draw_legend(draw=draw, x=legend_x, y=legend_y, width=230, height=legend_h)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    image.save(output_path)
+    return output_path
+
+
+def _draw_legend(draw, x: int, y: int, width: int, height: int) -> None:
+    draw.rectangle((x, y, x + width, y + height), outline=(100, 100, 100), fill=(250, 250, 250), width=1)
+    draw.text((x + 8, y + 8), "Legend", fill=(0, 0, 0))
+    draw.text((x + 8, y + 26), "D = Device", fill=(0, 0, 0))
+    draw.text((x + 8, y + 40), "P = Pin", fill=(0, 0, 0))
+    draw.text((x + 8, y + 54), "W = Wire", fill=(0, 0, 0))
+    draw.text((x + 120, y + 26), "H = horizontal", fill=(0, 0, 0))
+    draw.text((x + 120, y + 40), "V = vertical", fill=(0, 0, 0))
+
+
 def render_layout_ascii(layout: LayoutInstance, mode: str = "compact") -> str:
     return render_ascii(build_render_view(layout), mode=mode)
 
@@ -273,6 +404,7 @@ def render_layout_png_layers(
     prefix: str = "layout",
     tile_size: int = 72,
     draw_ports: bool = False,
+    show_coords: bool = False,
 ) -> list[Path]:
     return render_png_layers(
         build_render_view(layout),
@@ -280,4 +412,25 @@ def render_layout_png_layers(
         prefix=prefix,
         tile_size=tile_size,
         draw_ports=draw_ports,
+        show_coords=show_coords,
+    )
+
+
+def render_layout_png_stacked(
+    layout: LayoutInstance,
+    output_path: Path,
+    tile_px: int = 64,
+    stack_direction: str = "vertical",
+    draw_ports: bool = False,
+    show_coords: bool = False,
+    show_legend: bool = False,
+) -> Path:
+    return render_png_stacked(
+        build_render_view(layout),
+        output_path=output_path,
+        tile_px=tile_px,
+        stack_direction=stack_direction,
+        draw_ports=draw_ports,
+        show_coords=show_coords,
+        show_legend=show_legend,
     )
