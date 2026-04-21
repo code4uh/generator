@@ -21,6 +21,11 @@ def build_tile_representation(layout: LayoutInstance) -> TileRepresentation:
     for device in layout.devices:
         for layer in range(device.from_layer, device.to_layer + 1):
             coord = TileCoord(x=device.x, y=device.y, layer=layer)
+            if coord in occupied:
+                raise ValueError(
+                    f"duplicate device coordinate ({coord.x}, {coord.y}, {coord.layer}) for "
+                    f"{occupied[coord]!r} and {device.device_id!r}"
+                )
             occupied[coord] = device.device_id
         pin_keys[device.device_id] = {
             (pin.tile, pin.local_pos.px, pin.local_pos.py)

@@ -116,6 +116,26 @@ def test_duplicate_wire_tile_coord_never_silently_overwritten_in_representation(
         build_tile_representation(parsed)
 
 
+def test_duplicate_device_coord_never_silently_overwritten_in_representation() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    data["devices"].append(
+        {
+            "deviceId": "dev2",
+            "deviceType": "amp",
+            "slotId": "slotA",
+            "x": 1,
+            "y": 1,
+            "fromLayer": 1,
+            "toLayer": 2,
+            "pinGrid": {"cellsX": 2, "cellsY": 2},
+            "pins": [],
+        }
+    )
+    parsed = parse_layout(data)
+    with pytest.raises(ValueError, match="duplicate device coordinate"):
+        build_tile_representation(parsed)
+
+
 def test_duplicate_wire_id_in_ordered_wires() -> None:
     data = _load_json("examples/layout3d_valid_minimal.json")
     tile = data["wireTiles"][0]
