@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -149,3 +152,63 @@ def test_render_png_stacked_horizontal_smoke(tmp_path: Path) -> None:
         width, height = image.size
 
     assert width > height
+
+
+def test_render_demo_cli_help_lists_new_options() -> None:
+    env = dict(os.environ)
+    src_dir = ROOT / "src"
+    env["PYTHONPATH"] = str(src_dir) if "PYTHONPATH" not in env else f"{src_dir}:{env['PYTHONPATH']}"
+
+    proc = subprocess.run(
+        [sys.executable, "-m", "layout3d.render_demo", "-h"],
+        check=True,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+
+    stdout = proc.stdout
+    assert "--png-stacked-out" in stdout
+    assert "--stack-direction" in stdout
+    assert "--show-coords" in stdout
+    assert "--show-legend" in stdout
+
+
+def test_render_demo_cli_writes_layer_pngs_and_stacked_png(tmp_path: Path) -> None:
+    pytest.importorskip("PIL")
+
+    env = dict(os.environ)
+    src_dir = ROOT / "src"
+    env["PYTHONPATH"] = str(src_dir) if "PYTHONPATH" not in env else f"{src_dir}:{env['PYTHONPATH']}"
+
+    out_dir = tmp_path / "layers"
+    stacked = tmp_path / "stacked.png"
+    layout = ROOT / "examples" / "simple_layout.json"
+
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "layout3d.render_demo",
+            str(layout),
+            "--png-out",
+            str(out_dir),
+            "--prefix",
+            "demo",
+            "--png-stacked-out",
+            str(stacked),
+            "--stack-direction",
+            "horizontal",
+            "--show-coords",
+            "--show-legend",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+
+    layer_files = sorted(out_dir.glob("demo_layer*.png"))
+    assert layer_files
+    assert stacked.exists()
+    assert stacked.stat().st_size > 0
