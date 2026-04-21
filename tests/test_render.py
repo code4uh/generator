@@ -131,6 +131,27 @@ def test_render_png_stacked_vertical_smoke(tmp_path: Path) -> None:
     assert height > width
 
 
+def test_render_png_stacked_legend_fits_small_grid(tmp_path: Path) -> None:
+    pil_image = pytest.importorskip("PIL.Image")
+
+    layout = _load_layout("examples/layout3d_valid_minimal.json")
+    view = build_render_view(layout)
+    out_path = tmp_path / "stacked_with_legend.png"
+
+    render_png_stacked(
+        view,
+        output_path=out_path,
+        tile_px=16,
+        stack_direction="vertical",
+        show_legend=True,
+    )
+
+    with pil_image.open(out_path) as image:
+        width, _ = image.size
+
+    assert width >= 20 * 2 + 230
+
+
 def test_render_png_stacked_horizontal_smoke(tmp_path: Path) -> None:
     pil_image = pytest.importorskip("PIL.Image")
 
@@ -212,3 +233,33 @@ def test_render_demo_cli_writes_layer_pngs_and_stacked_png(tmp_path: Path) -> No
     assert layer_files
     assert stacked.exists()
     assert stacked.stat().st_size > 0
+
+
+def test_render_demo_cli_only_stacked_out_writes_no_layer_pngs(tmp_path: Path) -> None:
+    pytest.importorskip("PIL")
+
+    env = dict(os.environ)
+    src_dir = ROOT / "src"
+    env["PYTHONPATH"] = str(src_dir) if "PYTHONPATH" not in env else f"{src_dir}:{env['PYTHONPATH']}"
+
+    stacked = tmp_path / "stacked_only.png"
+    layout = ROOT / "examples" / "simple_layout.json"
+
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "layout3d.render_demo",
+            str(layout),
+            "--png-stacked-out",
+            str(stacked),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+
+    assert stacked.exists()
+    assert stacked.stat().st_size > 0
+    assert list(tmp_path.rglob("*_layer*.png")) == []
