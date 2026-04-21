@@ -17,6 +17,12 @@ def test_valid_cap_user_pattern() -> None:
     validate_spec(spec)
 
 
+def test_valid_cap_without_plus_connected_when_not_user_defined() -> None:
+    spec = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
+    assert "plusConnected" not in spec["inputs"]["topology"]
+    validate_spec(spec)
+
+
 def test_invalid_cap_missing_plus_connected() -> None:
     spec = load_fixture("spec/fixtures/invalid/cap_array_missing_plus_connected.json")
     with pytest.raises(SpecValidationError, match="plusConnected"):

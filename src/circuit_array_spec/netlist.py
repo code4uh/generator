@@ -7,6 +7,14 @@ from typing import Any
 
 from .derive import derive_cap_grid, derive_res_grid
 
+CAP_DEFAULT_VALUE = "1f"
+CAP_DEFAULT_WIDTH = "1u"
+CAP_DEFAULT_LENGTH = "1u"
+
+RES_DEFAULT_VALUE = "1k"
+RES_DEFAULT_WIDTH = "1u"
+RES_DEFAULT_LENGTH = "1u"
+
 
 def _parse_plus_connected(value: str) -> list[list[int]]:
     groups: list[list[int]] = []
@@ -38,17 +46,18 @@ def _cap_plus_nets(spec: dict[str, Any]) -> dict[int, str]:
     return {cap_idx: f"G{cap_idx}_p" for cap_idx in range(1, cap_count + 1)}
 
 
-def _cap_dummy_nets(connect_dummy_caps: str, dummy_name: str) -> tuple[str, str]:
+def _cap_dummy_nets(connect_dummy_caps: str, dummy_name: str) -> tuple[str, str] | None:
+    if connect_dummy_caps == "open_floating":
+        return None
     if connect_dummy_caps == "open_shorted":
-        net = f"{dummy_name}_s"
-        return net, net
+        return dummy_name, dummy_name
     if connect_dummy_caps == "shorted_G1_p":
-        return "G1_p", "Cdmy_n"
+        return "G1_p", "G1_p"
     if connect_dummy_caps == "shorted_Cdmy_p":
-        return "Cdmy_p", "Cdmy_n"
+        return "Cdmy_p", "Cdmy_p"
     if connect_dummy_caps == "Cdmy_p+Cdmy_n":
-        return "Cdmy", "Cdmy"
-    return f"{dummy_name}_p", f"{dummy_name}_n"
+        return "Cdmy_p", "Cdmy_n"
+    return dummy_name, f"{dummy_name}_n"
 
 
 def _generate_cap_netlist(spec: dict[str, Any]) -> str:
@@ -60,13 +69,20 @@ def _generate_cap_netlist(spec: dict[str, Any]) -> str:
     for cap_idx, count in enumerate(topology["cap_list"], start=1):
         for instance_idx in range(1, count + 1):
             name = f"C{cap_idx}_{instance_idx}"
-            lines.append(f"{name} {plus_nets[cap_idx]} GND CUNIT")
+            lines.append(
+                f"{name} {plus_nets[cap_idx]} GND {CAP_DEFAULT_VALUE} W={CAP_DEFAULT_WIDTH} L={CAP_DEFAULT_LENGTH}"
+            )
 
     grid = derive_cap_grid(spec)
     dummies = sorted({cell for row in grid["grid"] for cell in row if cell.startswith("C0_")})
     for dummy in dummies:
-        plus_net, minus_net = _cap_dummy_nets(topology["connectDummyCaps"], dummy)
-        lines.append(f"{dummy} {plus_net} {minus_net} CUNIT_DMY")
+        nets = _cap_dummy_nets(topology["connectDummyCaps"], dummy)
+        if nets is None:
+            continue
+        plus_net, minus_net = nets
+        lines.append(
+            f"{dummy} {plus_net} {minus_net} {CAP_DEFAULT_VALUE} W={CAP_DEFAULT_WIDTH} L={CAP_DEFAULT_LENGTH}"
+        )
 
     lines.append(".ENDS cap_array")
     return "\n".join(lines)
@@ -75,7 +91,7 @@ def _generate_cap_netlist(spec: dict[str, Any]) -> str:
 def _res_dummy_nets(connect_dummy_res: str, dummy_name: str) -> tuple[str, str]:
     if connect_dummy_res == "VSS":
         return "VSS", "VSS"
-    return f"{dummy_name}_p", f"{dummy_name}_n"
+    return dummy_name, f"{dummy_name}_n"
 
 
 def _generate_res_netlist(spec: dict[str, Any]) -> str:
@@ -88,13 +104,17 @@ def _generate_res_netlist(spec: dict[str, Any]) -> str:
             minus_net = f"D{divider_idx}_n" if series_idx == series_count else f"N{divider_idx}_{series_idx}"
             for parallel_idx in range(1, topology["parallelResNo"] + 1):
                 name = f"R{divider_idx}_{series_idx}_{parallel_idx}"
-                lines.append(f"{name} {plus_net} {minus_net} RUNIT")
+                lines.append(
+                    f"{name} {plus_net} {minus_net} {RES_DEFAULT_VALUE} W={RES_DEFAULT_WIDTH} L={RES_DEFAULT_LENGTH}"
+                )
 
     grid = derive_res_grid(spec)
     dummies = sorted({cell for row in grid["grid"] for cell in row if cell.startswith("R0_")})
     for dummy in dummies:
         plus_net, minus_net = _res_dummy_nets(topology["connectDummyRes"], dummy)
-        lines.append(f"{dummy} {plus_net} {minus_net} RUNIT_DMY")
+        lines.append(
+            f"{dummy} {plus_net} {minus_net} {RES_DEFAULT_VALUE} W={RES_DEFAULT_WIDTH} L={RES_DEFAULT_LENGTH}"
+        )
 
     lines.append(".ENDS res_array")
     return "\n".join(lines)

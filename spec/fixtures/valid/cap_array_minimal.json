@@ -7,7 +7,6 @@
         1
       ],
       "connection": "open",
-      "plusConnected": null,
       "connectDummyCaps": "open_floating",
       "boundary_caps": {
         "left": false,
