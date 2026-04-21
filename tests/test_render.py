@@ -210,12 +210,39 @@ def test_write_layer_gallery_html_contains_images_and_overlay(tmp_path: Path) ->
 
     assert out_html.exists()
     html = out_html.read_text(encoding="utf-8")
-    assert '<img src="../layers/demo_layer0.png"' in html
-    assert '<img src="../layers/demo_layer1.png"' in html
+    assert 'src="../layers/demo_layer0.png"' in html
+    assert 'src="../layers/demo_layer1.png"' in html
     assert "<h2>Layer 0</h2>" in html
     assert "<h2>Layer 1</h2>" in html
     assert 'id="overlay"' in html
     assert 'id="overlay-image"' in html
+
+
+def test_write_layer_gallery_html_includes_optional_stacked_image_first(tmp_path: Path) -> None:
+    png_dir = tmp_path / "layers"
+    png_dir.mkdir()
+    stacked_png = tmp_path / "stacked" / "demo_stacked.png"
+    stacked_png.parent.mkdir()
+    png0 = png_dir / "demo_layer0.png"
+    png1 = png_dir / "demo_layer1.png"
+    stacked_png.write_bytes(b"fake-stacked")
+    png0.write_bytes(b"fake-png-0")
+    png1.write_bytes(b"fake-png-1")
+
+    out_html = tmp_path / "gallery" / "layers.html"
+    write_layer_gallery_html(
+        out_html=out_html,
+        png_files=[png0, png1],
+        title="Demo",
+        stacked_png=stacked_png,
+    )
+
+    html = out_html.read_text(encoding="utf-8")
+    assert '<h2>Overview</h2>' in html
+    assert '../stacked/demo_stacked.png' in html
+    assert '../layers/demo_layer0.png' in html
+    assert '../layers/demo_layer1.png' in html
+    assert html.index("../stacked/demo_stacked.png") < html.index("../layers/demo_layer0.png")
 
 
 def test_render_demo_cli_writes_layer_pngs_and_stacked_png(tmp_path: Path) -> None:
@@ -293,6 +320,50 @@ def test_render_demo_cli_writes_html_gallery_when_png_out_is_set(tmp_path: Path)
     assert out_html.exists()
     html = out_html.read_text(encoding="utf-8")
     assert "demo_layer0.png" in html
+
+
+def test_render_demo_cli_writes_html_with_optional_stacked_image(tmp_path: Path) -> None:
+    pytest.importorskip("PIL")
+
+    env = dict(os.environ)
+    src_dir = ROOT / "src"
+    env["PYTHONPATH"] = str(src_dir) if "PYTHONPATH" not in env else f"{src_dir}:{env['PYTHONPATH']}"
+
+    out_dir = tmp_path / "layers"
+    stacked = tmp_path / "stacked" / "demo_stacked.png"
+    out_html = tmp_path / "gallery" / "layers.html"
+    layout = ROOT / "examples" / "simple_layout.json"
+
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "layout3d.render_demo",
+            str(layout),
+            "--png-out",
+            str(out_dir),
+            "--prefix",
+            "demo",
+            "--png-stacked-out",
+            str(stacked),
+            "--html-out",
+            str(out_html),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+
+    layer_files = sorted(out_dir.glob("demo_layer*.png"))
+    assert layer_files
+    assert stacked.exists()
+    assert out_html.exists()
+
+    html = out_html.read_text(encoding="utf-8")
+    assert "demo_stacked.png" in html
+    assert "demo_layer0.png" in html
+    assert html.index("demo_stacked.png") < html.index("demo_layer0.png")
 
 
 def test_render_demo_cli_only_stacked_out_writes_no_layer_pngs(tmp_path: Path) -> None:
