@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from circuit_array_spec.layout3d import (
+from layout3d import (
     LayoutPipeline,
     LayoutValidationError,
     LayoutValidator,
@@ -11,7 +11,7 @@ from circuit_array_spec.layout3d import (
     parse_layout,
     parse_layout_json,
 )
-from circuit_array_spec.layout3d.normalize import normalize_layout
+from layout3d.normalize import normalize_layout
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -129,3 +129,9 @@ def test_pipeline_raises_structured_error() -> None:
         assert first.location
     else:
         raise AssertionError("expected LayoutValidationError")
+
+
+def test_legacy_namespace_remains_compatible() -> None:
+    from circuit_array_spec.layout3d import LayoutPipeline as LegacyLayoutPipeline
+
+    assert LegacyLayoutPipeline is LayoutPipeline

@@ -78,7 +78,9 @@ Für `cap_array` mit `connectDummyCaps = "open_floating"` werden keine Dummy-/Bo
 
 ## Developer Note: Rasterbasiertes 3D-Layout
 
-Neue Module unter `circuit_array_spec.layout3d` trennen strikt:
+Kanonischer Namespace ist `layout3d` (die alten Pfade unter `circuit_array_spec.layout3d` bleiben als Kompatibilitäts-Wrapper erhalten).
+
+Module unter `layout3d` trennen strikt:
 
 1. `parser.py`: Mapping/JSON -> typsichere Domänenobjekte
 2. `normalize.py`: deterministische Sortierung ohne implizite Geometrie

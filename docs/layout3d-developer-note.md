@@ -92,3 +92,7 @@ Dieses Modell enthält **bewusst kein Routing**:
 2. `normalize_layout`
 3. `LayoutValidator.validate`
 4. `build_tile_representation`
+
+## Namespace-Hinweis
+- Kanonischer Import: `layout3d`
+- `circuit_array_spec.layout3d` ist als rückwärtskompatibler Re-Export vorhanden.
