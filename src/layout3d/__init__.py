@@ -1,6 +1,6 @@
 """3D-Layout-Modellierung und -Validierung."""
 
-from .errors import LayoutValidationError, ValidationIssue, ValidationReport
+from .errors import LayoutValidationError, ParseError, ValidationIssue, ValidationReport
 from .normalize import normalize_layout
 from .parser import layout_to_dict, layout_to_json, parse_layout, parse_layout_json
 from .pipeline import LayoutPipeline
@@ -46,6 +46,7 @@ __all__ = [
     "layout_to_dict",
     "layout_to_json",
     "normalize_layout",
+    "ParseError",
     "parse_layout",
     "parse_layout_json",
 ]

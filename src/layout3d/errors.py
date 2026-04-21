@@ -33,3 +33,13 @@ class LayoutValidationError(ValueError):
             for issue in issues
         )
         super().__init__(msg)
+
+
+class ParseError(ValueError):
+    """Konsistenter Fehler für Parser-Probleme mit optionalem Pfadkontext."""
+
+    def __init__(self, message: str, *, path: str | None = None):
+        self.message = message
+        self.path = path
+        suffix = f" at {path}" if path else ""
+        super().__init__(f"{message}{suffix}")

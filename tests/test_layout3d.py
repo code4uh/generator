@@ -9,6 +9,7 @@ from layout3d import (
     LayoutPipeline,
     LayoutValidationError,
     LayoutValidator,
+    ParseError,
     layout_to_dict,
     parse_layout,
     parse_layout_json,
@@ -169,8 +170,20 @@ def test_pin_grid_dimensions_must_be_positive() -> None:
 def test_parse_error_contains_field_path() -> None:
     data = _load_json("examples/layout3d_valid_minimal.json")
     data["devices"][0]["pinGrid"]["cellsX"] = "2"
-    with pytest.raises(TypeError, match=r"devices\[0\]\.pinGrid\.cellsX"):
+    with pytest.raises(ParseError, match=r"devices\[0\]\.pinGrid\.cellsX"):
         parse_layout(data)
+
+
+@pytest.mark.parametrize(
+    "rel_path",
+    (
+        "examples/simple_layout.json",
+        "examples/complex_layout.json",
+    ),
+)
+def test_demo_examples_parse_and_validate(rel_path: str) -> None:
+    report = _validate(_load_json(rel_path))
+    assert report.ok
 
 
 def test_pipeline_raises_structured_error() -> None:

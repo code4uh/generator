@@ -6,6 +6,7 @@ import json
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from .errors import ParseError
 from .types import (
     Device,
     DevicePin,
@@ -23,7 +24,13 @@ from .types import (
 
 
 def parse_layout_json(payload: str) -> Mapping[str, Any]:
-    return json.loads(payload)
+    try:
+        parsed = json.loads(payload)
+    except json.JSONDecodeError as exc:
+        raise ParseError("invalid JSON payload", path="root") from exc
+    if not isinstance(parsed, Mapping):
+        raise ParseError("expected mapping", path="root")
+    return parsed
 
 
 def layout_to_dict(layout: LayoutInstance) -> dict[str, Any]:
@@ -100,37 +107,31 @@ def layout_to_json(layout: LayoutInstance, *, indent: int = 2) -> str:
 
 def _req(mapping: Mapping[str, Any], key: str, *, path: str | None = None) -> Any:
     if key not in mapping:
-        if path is None:
-            raise KeyError(key)
-        raise KeyError(f"missing key '{key}' at {path}")
+        raise ParseError(f"missing key '{key}'", path=path)
     return mapping[key]
 
 
 def _as_str(value: Any, *, path: str | None = None) -> str:
     if not isinstance(value, str):
-        suffix = f" at {path}" if path is not None else ""
-        raise TypeError(f"expected str, got {type(value).__name__}{suffix}")
+        raise ParseError(f"expected str, got {type(value).__name__}", path=path)
     return value
 
 
 def _as_int(value: Any, *, path: str | None = None) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
-        suffix = f" at {path}" if path is not None else ""
-        raise TypeError(f"expected int, got {type(value).__name__}{suffix}")
+        raise ParseError(f"expected int, got {type(value).__name__}", path=path)
     return value
 
 
 def _as_mapping(value: Any, *, path: str | None = None) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
-        suffix = f" at {path}" if path is not None else ""
-        raise TypeError(f"expected mapping, got {type(value).__name__}{suffix}")
+        raise ParseError(f"expected mapping, got {type(value).__name__}", path=path)
     return value
 
 
 def _as_sequence(value: Any, *, path: str | None = None) -> Sequence[Any]:
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes, bytearray)):
-        suffix = f" at {path}" if path is not None else ""
-        raise TypeError(f"expected sequence, got {type(value).__name__}{suffix}")
+        raise ParseError(f"expected sequence, got {type(value).__name__}", path=path)
     return value
 
 
