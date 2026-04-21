@@ -1,0 +1,137 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from layout3d import (
+    LayoutPipeline,
+    LayoutValidationError,
+    LayoutValidator,
+    layout_to_dict,
+    parse_layout,
+    parse_layout_json,
+)
+from layout3d.normalize import normalize_layout
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _load_json(rel_path: str) -> dict:
+    return json.loads((ROOT / rel_path).read_text(encoding="utf-8"))
+
+
+def _validate(data: dict):
+    parsed = parse_layout(data)
+    normalized = normalize_layout(parsed)
+    return LayoutValidator().validate(normalized)
+
+
+def _codes(report) -> set[str]:
+    return {issue.code for issue in report.issues}
+
+
+def test_valid_minimal_example() -> None:
+    raw = (ROOT / "examples/layout3d_valid_minimal.json").read_text(encoding="utf-8")
+    parsed_from_json = parse_layout(parse_layout_json(raw))
+    report = _validate(layout_to_dict(parsed_from_json))
+    assert report.ok
+
+
+def test_device_outside_grid() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    data["devices"][0]["x"] = 99
+    report = _validate(data)
+    assert "OUT_OF_GRID" in _codes(report)
+
+
+def test_device_outside_slot() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    data["devices"][0]["y"] = 0
+    report = _validate(data)
+    assert "DEVICE_OUTSIDE_SLOT" in _codes(report)
+
+
+def test_device_overlap() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    data["devices"].append(
+        {
+            "deviceId": "dev2",
+            "deviceType": "amp",
+            "slotId": "slotA",
+            "x": 1,
+            "y": 1,
+            "fromLayer": 1,
+            "toLayer": 2,
+            "pinGrid": {"cellsX": 2, "cellsY": 2},
+            "pins": [],
+        }
+    )
+    report = _validate(data)
+    assert "DEVICE_OVERLAP" in _codes(report)
+
+
+def test_pin_outside_pingrid() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    data["devices"][0]["pins"][0]["localPos"] = {"px": 2, "py": 0}
+    report = _validate(data)
+    assert "PIN_LOCAL_POS" in _codes(report)
+
+
+def test_duplicate_port() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    data["devices"][0]["pins"][0]["attachment"]["ports"].append({"side": "north", "pos_idx": 0})
+    report = _validate(data)
+    assert "DUPLICATE_PORT" in _codes(report)
+
+
+def test_multiple_distinct_ports_are_valid_or_semantics() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    data["devices"][0]["pins"][0]["attachment"]["ports"] = [
+        {"side": "north", "pos_idx": 0},
+        {"side": "south", "pos_idx": 1},
+    ]
+    report = _validate(data)
+    assert report.ok
+
+
+def test_duplicate_wire_tile_on_same_coord() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    second = dict(data["wireTiles"][0])
+    second["wireTileId"] = "wt2"
+    data["wireTiles"].append(second)
+    report = _validate(data)
+    assert "DUPLICATE_WIRE_TILE_COORD" in _codes(report)
+
+
+def test_duplicate_wire_id_in_ordered_wires() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    tile = data["wireTiles"][0]
+    tile["orderedWires"].append(
+        {
+            "wireId": "w1",
+            "wireType": "sig",
+            "netId": "n2",
+            "orientation": "vertical",
+        }
+    )
+    report = _validate(data)
+    assert "DUPLICATE_WIRE_ID" in _codes(report)
+
+
+def test_pipeline_raises_structured_error() -> None:
+    data = _load_json("examples/layout3d_invalid_overlap.json")
+    try:
+        LayoutPipeline().parse_normalize_validate(data)
+    except LayoutValidationError as error:
+        assert error.issues
+        first = error.issues[0]
+        assert first.entity_type
+        assert first.location
+    else:
+        raise AssertionError("expected LayoutValidationError")
+
+
+def test_legacy_namespace_remains_compatible() -> None:
+    from circuit_array_spec.layout3d import LayoutPipeline as LegacyLayoutPipeline
+
+    assert LegacyLayoutPipeline is LayoutPipeline
