@@ -35,28 +35,28 @@ def _codes(report) -> set[str]:
 
 
 def test_valid_minimal_example() -> None:
-    raw = (ROOT / "examples/layout3d_valid_minimal.json").read_text(encoding="utf-8")
+    raw = (ROOT / "examples/json/layout3d_valid_minimal.json").read_text(encoding="utf-8")
     parsed_from_json = parse_layout(parse_layout_json(raw))
     report = _validate(layout_to_dict(parsed_from_json))
     assert report.ok
 
 
 def test_device_outside_grid() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     data["devices"][0]["x"] = 99
     report = _validate(data)
     assert "OUT_OF_GRID" in _codes(report)
 
 
 def test_device_outside_slot() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     data["devices"][0]["y"] = 0
     report = _validate(data)
     assert "DEVICE_OUTSIDE_SLOT" in _codes(report)
 
 
 def test_device_overlap() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     data["devices"].append(
         {
             "deviceId": "dev2",
@@ -75,21 +75,21 @@ def test_device_overlap() -> None:
 
 
 def test_pin_outside_pingrid() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     data["devices"][0]["pins"][0]["localPos"] = {"px": 2, "py": 0}
     report = _validate(data)
     assert "PIN_LOCAL_POS" in _codes(report)
 
 
 def test_duplicate_port() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     data["devices"][0]["pins"][0]["attachment"]["ports"].append({"side": "north", "pos_idx": 0})
     report = _validate(data)
     assert "DUPLICATE_PORT" in _codes(report)
 
 
 def test_multiple_distinct_ports_are_valid_or_semantics() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     data["devices"][0]["pins"][0]["attachment"]["ports"] = [
         {"side": "north", "pos_idx": 0},
         {"side": "south", "pos_idx": 1},
@@ -99,7 +99,7 @@ def test_multiple_distinct_ports_are_valid_or_semantics() -> None:
 
 
 def test_duplicate_wire_tile_on_same_coord() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     second = dict(data["wireTiles"][0])
     second["wireTileId"] = "wt2"
     data["wireTiles"].append(second)
@@ -108,7 +108,7 @@ def test_duplicate_wire_tile_on_same_coord() -> None:
 
 
 def test_duplicate_wire_tile_coord_never_silently_overwritten_in_representation() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     second = dict(data["wireTiles"][0])
     second["wireTileId"] = "wt2"
     data["wireTiles"].append(second)
@@ -118,7 +118,7 @@ def test_duplicate_wire_tile_coord_never_silently_overwritten_in_representation(
 
 
 def test_duplicate_device_coord_never_silently_overwritten_in_representation() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     data["devices"].append(
         {
             "deviceId": "dev2",
@@ -138,7 +138,7 @@ def test_duplicate_device_coord_never_silently_overwritten_in_representation() -
 
 
 def test_duplicate_wire_id_in_ordered_wires() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     tile = data["wireTiles"][0]
     tile["orderedWires"].append(
         {
@@ -152,28 +152,28 @@ def test_duplicate_wire_id_in_ordered_wires() -> None:
 
 
 def test_wire_tile_orientation_parsed_on_tile_level() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     parsed = parse_layout(data)
     assert parsed.wire_tiles[0].orientation == "horizontal"
     assert not hasattr(parsed.wire_tiles[0].ordered_wires[0], "orientation")
 
 
 def test_missing_wire_tile_orientation_raises_parse_error() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     del data["wireTiles"][0]["orientation"]
     with pytest.raises(ParseError, match=r"wireTiles\[0\]"):
         parse_layout(data)
 
 
 def test_invalid_wire_tile_orientation_is_reported_by_validation() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     data["wireTiles"][0]["orientation"] = "diagonal"
     report = _validate(data)
     assert "WIRE_ORIENTATION" in _codes(report)
 
 
 def test_device_slot_is_validated_even_without_devices() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     data["devices"] = []
     data["deviceSlots"][0]["x"] = 999
     report = _validate(data)
@@ -181,14 +181,14 @@ def test_device_slot_is_validated_even_without_devices() -> None:
 
 
 def test_pin_grid_dimensions_must_be_positive() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     data["devices"][0]["pinGrid"] = {"cellsX": 0, "cellsY": -1}
     report = _validate(data)
     assert "PIN_GRID_DIMENSION" in _codes(report)
 
 
 def test_parse_error_contains_field_path() -> None:
-    data = _load_json("examples/layout3d_valid_minimal.json")
+    data = _load_json("examples/json/layout3d_valid_minimal.json")
     data["devices"][0]["pinGrid"]["cellsX"] = "2"
     with pytest.raises(ParseError, match=r"devices\[0\]\.pinGrid\.cellsX"):
         parse_layout(data)
@@ -197,8 +197,8 @@ def test_parse_error_contains_field_path() -> None:
 @pytest.mark.parametrize(
     "rel_path",
     (
-        "examples/simple_layout.json",
-        "examples/complex_layout.json",
+        "examples/json/simple_layout.json",
+        "examples/json/complex_layout.json",
     ),
 )
 def test_demo_examples_parse_and_validate(rel_path: str) -> None:
@@ -207,7 +207,7 @@ def test_demo_examples_parse_and_validate(rel_path: str) -> None:
 
 
 def test_pipeline_raises_structured_error() -> None:
-    data = _load_json("examples/layout3d_invalid_overlap.json")
+    data = _load_json("examples/json/layout3d_invalid_overlap.json")
     try:
         LayoutPipeline().parse_normalize_validate(data)
     except LayoutValidationError as error:
