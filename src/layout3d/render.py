@@ -26,6 +26,7 @@ class RenderCellView:
     device_id: str | None
     device_type: str | None
     pins: tuple[RenderPinView, ...]
+    wire_orientation: str | None
     wires: tuple[WireEntry, ...]
 
     @property
@@ -85,9 +86,11 @@ def build_render_view(layout: LayoutInstance) -> LayoutRenderView:
         pin_views.sort(key=lambda p: p.pin_id)
 
     wires_by_coord: dict[TileCoord, tuple[WireEntry, ...]] = {}
+    wire_orientation_by_coord: dict[TileCoord, str] = {}
     for wire_tile in layout.wire_tiles:
         coord = TileCoord(x=wire_tile.x, y=wire_tile.y, layer=wire_tile.layer)
         wires_by_coord[coord] = wire_tile.ordered_wires
+        wire_orientation_by_coord[coord] = wire_tile.orientation
 
     by_layer: dict[int, RenderLayerView] = {}
     layer_numbers = tuple(range(layout.grid.layers))
@@ -104,6 +107,7 @@ def build_render_view(layout: LayoutInstance) -> LayoutRenderView:
                     device_id=None if device is None else device[0],
                     device_type=None if device is None else device[1],
                     pins=tuple(pins_by_coord.get(coord, [])),
+                    wire_orientation=wire_orientation_by_coord.get(coord),
                     wires=wires_by_coord.get(coord, ()),
                 )
                 cells[(x, y)] = cell
@@ -185,9 +189,7 @@ def _detailed_token(cell: RenderCellView) -> str:
 
 
 def _wire_orientation(cell: RenderCellView) -> str | None:
-    if not cell.wires:
-        return None
-    return cell.wires[0].orientation
+    return cell.wire_orientation
 
 
 def _pins_repr(cell: RenderCellView) -> str:
@@ -199,8 +201,9 @@ def _pins_repr(cell: RenderCellView) -> str:
 
 
 def _wires_repr(cell: RenderCellView) -> str:
+    orientation = _wire_orientation(cell)
     return "[" + "; ".join(
-        f"{wire.wire_id}:{wire.net_id}:{wire.orientation}" for wire in cell.wires
+        f"{wire.wire_id}:{wire.net_id}:{orientation}" for wire in cell.wires
     ) + "]"
 
 

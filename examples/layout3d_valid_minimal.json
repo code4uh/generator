@@ -1,11 +1,17 @@
 {
   "schemaVersion": 1,
   "templateRef": "tpl/minimal",
-  "grid": { "cellsX": 3, "cellsY": 3, "layers": 3 },
+  "grid": {
+    "cellsX": 3,
+    "cellsY": 3,
+    "layers": 3
+  },
   "deviceSlots": [
     {
       "slotId": "slotA",
-      "allowedDeviceTypes": ["amp"],
+      "allowedDeviceTypes": [
+        "amp"
+      ],
       "x": 1,
       "y": 1,
       "fromLayer": 0,
@@ -21,16 +27,32 @@
       "y": 1,
       "fromLayer": 0,
       "toLayer": 1,
-      "pinGrid": { "cellsX": 2, "cellsY": 2 },
+      "pinGrid": {
+        "cellsX": 2,
+        "cellsY": 2
+      },
       "pins": [
         {
           "pinId": "p1",
-          "tile": { "x": 1, "y": 1, "layer": 0 },
-          "localPos": { "px": 0, "py": 0 },
+          "tile": {
+            "x": 1,
+            "y": 1,
+            "layer": 0
+          },
+          "localPos": {
+            "px": 0,
+            "py": 0
+          },
           "attachment": {
             "ports": [
-              { "side": "north", "pos_idx": 0 },
-              { "side": "east", "pos_idx": 1 }
+              {
+                "side": "north",
+                "pos_idx": 0
+              },
+              {
+                "side": "east",
+                "pos_idx": 1
+              }
             ]
           }
         }
@@ -43,12 +65,12 @@
       "x": 2,
       "y": 1,
       "layer": 0,
+      "orientation": "horizontal",
       "orderedWires": [
         {
           "wireId": "w1",
           "wireType": "sig",
-          "netId": "n1",
-          "orientation": "horizontal"
+          "netId": "n1"
         }
       ]
     }

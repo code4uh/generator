@@ -1,11 +1,17 @@
 {
   "schemaVersion": 1,
   "templateRef": "tpl/demo-complex",
-  "grid": { "cellsX": 6, "cellsY": 5, "layers": 4 },
+  "grid": {
+    "cellsX": 6,
+    "cellsY": 5,
+    "layers": 4
+  },
   "deviceSlots": [
     {
       "slotId": "slotCtrl",
-      "allowedDeviceTypes": ["controller"],
+      "allowedDeviceTypes": [
+        "controller"
+      ],
       "x": 1,
       "y": 1,
       "fromLayer": 0,
@@ -13,7 +19,9 @@
     },
     {
       "slotId": "slotAmp",
-      "allowedDeviceTypes": ["amp"],
+      "allowedDeviceTypes": [
+        "amp"
+      ],
       "x": 3,
       "y": 1,
       "fromLayer": 1,
@@ -21,7 +29,9 @@
     },
     {
       "slotId": "slotMem",
-      "allowedDeviceTypes": ["memory"],
+      "allowedDeviceTypes": [
+        "memory"
+      ],
       "x": 4,
       "y": 3,
       "fromLayer": 0,
@@ -37,25 +47,53 @@
       "y": 1,
       "fromLayer": 0,
       "toLayer": 3,
-      "pinGrid": { "cellsX": 3, "cellsY": 3 },
+      "pinGrid": {
+        "cellsX": 3,
+        "cellsY": 3
+      },
       "pins": [
         {
           "pinId": "ctrl_bus",
-          "tile": { "x": 1, "y": 1, "layer": 2 },
-          "localPos": { "px": 1, "py": 1 },
+          "tile": {
+            "x": 1,
+            "y": 1,
+            "layer": 2
+          },
+          "localPos": {
+            "px": 1,
+            "py": 1
+          },
           "attachment": {
             "ports": [
-              { "side": "north", "pos_idx": 1 },
-              { "side": "south", "pos_idx": 1 }
+              {
+                "side": "north",
+                "pos_idx": 1
+              },
+              {
+                "side": "south",
+                "pos_idx": 1
+              }
             ]
           }
         },
         {
           "pinId": "ctrl_sync",
-          "tile": { "x": 1, "y": 1, "layer": 0 },
-          "localPos": { "px": 2, "py": 0 },
+          "tile": {
+            "x": 1,
+            "y": 1,
+            "layer": 0
+          },
+          "localPos": {
+            "px": 2,
+            "py": 0
+          },
           "attachment": {
-            "ports": [{ "side": "east", "pos_idx": 2 }]
+            "ports": [
+              {
+                "side": "east",
+                "pos_idx": 2
+              }
+            ]
           }
         }
       ]
@@ -68,24 +106,52 @@
       "y": 1,
       "fromLayer": 1,
       "toLayer": 2,
-      "pinGrid": { "cellsX": 2, "cellsY": 3 },
+      "pinGrid": {
+        "cellsX": 2,
+        "cellsY": 3
+      },
       "pins": [
         {
           "pinId": "amp_in",
-          "tile": { "x": 3, "y": 1, "layer": 1 },
-          "localPos": { "px": 0, "py": 1 },
+          "tile": {
+            "x": 3,
+            "y": 1,
+            "layer": 1
+          },
+          "localPos": {
+            "px": 0,
+            "py": 1
+          },
           "attachment": {
-            "ports": [{ "side": "west", "pos_idx": 1 }]
+            "ports": [
+              {
+                "side": "west",
+                "pos_idx": 1
+              }
+            ]
           }
         },
         {
           "pinId": "amp_out",
-          "tile": { "x": 3, "y": 1, "layer": 2 },
-          "localPos": { "px": 1, "py": 1 },
+          "tile": {
+            "x": 3,
+            "y": 1,
+            "layer": 2
+          },
+          "localPos": {
+            "px": 1,
+            "py": 1
+          },
           "attachment": {
             "ports": [
-              { "side": "east", "pos_idx": 1 },
-              { "side": "north", "pos_idx": 0 }
+              {
+                "side": "east",
+                "pos_idx": 1
+              },
+              {
+                "side": "north",
+                "pos_idx": 0
+              }
             ]
           }
         }
@@ -99,14 +165,29 @@
       "y": 3,
       "fromLayer": 0,
       "toLayer": 1,
-      "pinGrid": { "cellsX": 2, "cellsY": 2 },
+      "pinGrid": {
+        "cellsX": 2,
+        "cellsY": 2
+      },
       "pins": [
         {
           "pinId": "mem_data",
-          "tile": { "x": 4, "y": 3, "layer": 1 },
-          "localPos": { "px": 0, "py": 0 },
+          "tile": {
+            "x": 4,
+            "y": 3,
+            "layer": 1
+          },
+          "localPos": {
+            "px": 0,
+            "py": 0
+          },
           "attachment": {
-            "ports": [{ "side": "south", "pos_idx": 0 }]
+            "ports": [
+              {
+                "side": "south",
+                "pos_idx": 0
+              }
+            ]
           }
         }
       ]
@@ -118,12 +199,12 @@
       "x": 0,
       "y": 1,
       "layer": 0,
+      "orientation": "horizontal",
       "orderedWires": [
         {
           "wireId": "w_ctrl_sync",
           "wireType": "clk",
-          "netId": "net_sync",
-          "orientation": "horizontal"
+          "netId": "net_sync"
         }
       ]
     },
@@ -132,18 +213,17 @@
       "x": 2,
       "y": 1,
       "layer": 1,
+      "orientation": "horizontal",
       "orderedWires": [
         {
           "wireId": "w_bus_0",
           "wireType": "sig",
-          "netId": "net_bus",
-          "orientation": "horizontal"
+          "netId": "net_bus"
         },
         {
           "wireId": "w_bus_1",
           "wireType": "sig",
-          "netId": "net_bus_aux",
-          "orientation": "vertical"
+          "netId": "net_bus_aux"
         }
       ]
     },
@@ -152,12 +232,12 @@
       "x": 2,
       "y": 2,
       "layer": 2,
+      "orientation": "vertical",
       "orderedWires": [
         {
           "wireId": "w_amp_out",
           "wireType": "sig",
-          "netId": "net_out",
-          "orientation": "vertical"
+          "netId": "net_out"
         }
       ]
     },
@@ -166,12 +246,12 @@
       "x": 5,
       "y": 3,
       "layer": 1,
+      "orientation": "horizontal",
       "orderedWires": [
         {
           "wireId": "w_mem_data",
           "wireType": "sig",
-          "netId": "net_mem",
-          "orientation": "horizontal"
+          "netId": "net_mem"
         }
       ]
     }

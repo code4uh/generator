@@ -86,12 +86,12 @@ def layout_to_dict(layout: LayoutInstance) -> dict[str, Any]:
                 "x": tile.x,
                 "y": tile.y,
                 "layer": tile.layer,
+                "orientation": tile.orientation,
                 "orderedWires": [
                     {
                         "wireId": entry.wire_id,
                         "wireType": entry.wire_type,
                         "netId": entry.net_id,
-                        "orientation": entry.orientation,
                     }
                     for entry in tile.ordered_wires
                 ],
@@ -251,6 +251,7 @@ def _parse_wire_tile(raw: Any, idx: int) -> WireTile:
         x=_as_int(_req(m, "x", path=base), path=f"{base}.x"),
         y=_as_int(_req(m, "y", path=base), path=f"{base}.y"),
         layer=_as_int(_req(m, "layer", path=base), path=f"{base}.layer"),
+        orientation=_as_str(_req(m, "orientation", path=base), path=f"{base}.orientation"),
         ordered_wires=entries,
     )
 
@@ -262,5 +263,4 @@ def _parse_wire_entry(raw: Any, *, base: str, idx: int) -> WireEntry:
         wire_id=_as_str(_req(m, "wireId", path=entry_base), path=f"{entry_base}.wireId"),
         wire_type=_as_str(_req(m, "wireType", path=entry_base), path=f"{entry_base}.wireType"),
         net_id=_as_str(_req(m, "netId", path=entry_base), path=f"{entry_base}.netId"),
-        orientation=_as_str(_req(m, "orientation", path=entry_base), path=f"{entry_base}.orientation"),
     )

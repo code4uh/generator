@@ -269,18 +269,19 @@ def _validate_wire_tiles(normalized: NormalizedLayout) -> list[ValidationIssue]:
                 )
             )
 
+        if tile.orientation not in _VALID_WIRE_ORIENTATION:
+            issues.append(
+                _issue(
+                    "WIRE_ORIENTATION",
+                    "wireTile",
+                    tile.wire_tile_id,
+                    ("wireTiles", tile.wire_tile_id, "orientation"),
+                    "invalid orientation",
+                )
+            )
+
         seen_wire_ids: set[str] = set()
         for entry in tile.ordered_wires:
-            if entry.orientation not in _VALID_WIRE_ORIENTATION:
-                issues.append(
-                    _issue(
-                        "WIRE_ORIENTATION",
-                        "wire",
-                        entry.wire_id,
-                        ("wireTiles", tile.wire_tile_id, "orderedWires", entry.wire_id, "orientation"),
-                        "invalid orientation",
-                    )
-                )
             if entry.wire_id in seen_wire_ids:
                 issues.append(
                     _issue(

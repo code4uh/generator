@@ -1,11 +1,17 @@
 {
   "schemaVersion": 1,
   "templateRef": "tpl/demo-simple",
-  "grid": { "cellsX": 4, "cellsY": 3, "layers": 3 },
+  "grid": {
+    "cellsX": 4,
+    "cellsY": 3,
+    "layers": 3
+  },
   "deviceSlots": [
     {
       "slotId": "slotAmp",
-      "allowedDeviceTypes": ["amp"],
+      "allowedDeviceTypes": [
+        "amp"
+      ],
       "x": 1,
       "y": 1,
       "fromLayer": 0,
@@ -13,7 +19,9 @@
     },
     {
       "slotId": "slotAdc",
-      "allowedDeviceTypes": ["adc"],
+      "allowedDeviceTypes": [
+        "adc"
+      ],
       "x": 2,
       "y": 1,
       "fromLayer": 1,
@@ -29,14 +37,29 @@
       "y": 1,
       "fromLayer": 0,
       "toLayer": 1,
-      "pinGrid": { "cellsX": 2, "cellsY": 2 },
+      "pinGrid": {
+        "cellsX": 2,
+        "cellsY": 2
+      },
       "pins": [
         {
           "pinId": "in",
-          "tile": { "x": 1, "y": 1, "layer": 0 },
-          "localPos": { "px": 0, "py": 0 },
+          "tile": {
+            "x": 1,
+            "y": 1,
+            "layer": 0
+          },
+          "localPos": {
+            "px": 0,
+            "py": 0
+          },
           "attachment": {
-            "ports": [{ "side": "west", "pos_idx": 0 }]
+            "ports": [
+              {
+                "side": "west",
+                "pos_idx": 0
+              }
+            ]
           }
         }
       ]
@@ -49,14 +72,29 @@
       "y": 1,
       "fromLayer": 1,
       "toLayer": 2,
-      "pinGrid": { "cellsX": 2, "cellsY": 2 },
+      "pinGrid": {
+        "cellsX": 2,
+        "cellsY": 2
+      },
       "pins": [
         {
           "pinId": "sense",
-          "tile": { "x": 2, "y": 1, "layer": 1 },
-          "localPos": { "px": 1, "py": 0 },
+          "tile": {
+            "x": 2,
+            "y": 1,
+            "layer": 1
+          },
+          "localPos": {
+            "px": 1,
+            "py": 0
+          },
           "attachment": {
-            "ports": [{ "side": "east", "pos_idx": 1 }]
+            "ports": [
+              {
+                "side": "east",
+                "pos_idx": 1
+              }
+            ]
           }
         }
       ]
@@ -68,12 +106,12 @@
       "x": 0,
       "y": 1,
       "layer": 0,
+      "orientation": "horizontal",
       "orderedWires": [
         {
           "wireId": "w_sig_0",
           "wireType": "sig",
-          "netId": "net_in",
-          "orientation": "horizontal"
+          "netId": "net_in"
         }
       ]
     },
@@ -82,12 +120,12 @@
       "x": 3,
       "y": 1,
       "layer": 1,
+      "orientation": "vertical",
       "orderedWires": [
         {
           "wireId": "w_sig_1",
           "wireType": "sig",
-          "netId": "net_sense",
-          "orientation": "vertical"
+          "netId": "net_sense"
         }
       ]
     }

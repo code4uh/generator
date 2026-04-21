@@ -82,7 +82,6 @@ class WireEntry:
     wire_id: str
     wire_type: str
     net_id: str
-    orientation: WireOrientation
 
 
 @dataclass(frozen=True)
@@ -91,6 +90,7 @@ class WireTile:
     x: int
     y: int
     layer: int
+    orientation: WireOrientation
     ordered_wires: tuple[WireEntry, ...]
 
 
