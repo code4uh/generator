@@ -20,3 +20,7 @@ __all__ = [
     "derive_res_grid",
     "generate_netlist",
 ]
+
+from .layout3d import LayoutPipeline, LayoutValidationError, LayoutValidator
+
+__all__.extend(["LayoutPipeline", "LayoutValidationError", "LayoutValidator"] )

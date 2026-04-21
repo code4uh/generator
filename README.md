@@ -75,3 +75,26 @@ Die Netlist-Ausgabe ist SPICE-ähnlich und nutzt Defaultwerte:
 - `res_array`: `1k`, `W=1u`, `L=1u`
 
 Für `cap_array` mit `connectDummyCaps = "open_floating"` werden keine Dummy-/Boundary-Cap-Zeilen erzeugt.
+
+## Developer Note: Rasterbasiertes 3D-Layout
+
+Kanonischer Namespace ist `layout3d` (die alten Pfade unter `circuit_array_spec.layout3d` bleiben als Kompatibilitäts-Wrapper erhalten).
+
+Module unter `layout3d` trennen strikt:
+
+1. `parser.py`: Mapping/JSON -> typsichere Domänenobjekte
+2. `normalize.py`: deterministische Sortierung ohne implizite Geometrie
+3. `validation.py`: regelbasierte Basisvalidierung mit strukturierten `ValidationIssue`s
+4. `representation.py`: interne tile-basierte Repräsentation (`TileRepresentation`)
+5. `pipeline.py`: explizite Orchestrierung der Schritte
+
+Semantik:
+- ausschließlich diskrete Tiles `(x, y, layer)`
+- Devices belegen zusammenhängende Layer-Spannen auf genau einem XY-Tile
+- keine impliziten Nachbarschaften oder Routing-Logik
+- WireTiles gelten immer nur für genau einen Layer
+
+Zusätzlich unterstützt `layout3d` jetzt JSON-Ein-/Ausgabe (`parse_layout_json`, `layout_to_dict`, `layout_to_json`)
+sowie Normalisierungs-Lookups (ID-Maps, Device-Tile-Expansion, WireTile-Map pro `(x,y,layer)`).
+
+Eine kompakte Entwicklerdokumentation liegt unter `docs/layout3d-developer-note.md`.

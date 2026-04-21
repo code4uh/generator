@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "templateRef": "tpl/overlap",
+  "grid": { "cellsX": 3, "cellsY": 3, "layers": 3 },
+  "deviceSlots": [
+    {
+      "slotId": "slotA",
+      "allowedDeviceTypes": ["amp"],
+      "x": 1,
+      "y": 1,
+      "fromLayer": 0,
+      "toLayer": 2
+    }
+  ],
+  "devices": [
+    {
+      "deviceId": "dev1",
+      "deviceType": "amp",
+      "slotId": "slotA",
+      "x": 1,
+      "y": 1,
+      "fromLayer": 0,
+      "toLayer": 1,
+      "pinGrid": { "cellsX": 2, "cellsY": 2 },
+      "pins": []
+    },
+    {
+      "deviceId": "dev2",
+      "deviceType": "amp",
+      "slotId": "slotA",
+      "x": 1,
+      "y": 1,
+      "fromLayer": 1,
+      "toLayer": 2,
+      "pinGrid": { "cellsX": 2, "cellsY": 2 },
+      "pins": []
+    }
+  ],
+  "wireTiles": []
+}
