@@ -11,8 +11,20 @@ def write_layer_gallery_html(
     out_html: Path,
     png_files: list[Path],
     title: str = "Layout-Layer",
+    stacked_png: Path | None = None,
 ) -> None:
     sections: list[str] = []
+    if stacked_png is not None:
+        rel_stacked = Path(relpath(stacked_png.resolve(), start=out_html.parent.resolve()))
+        stacked_src = escape(rel_stacked.as_posix(), quote=True)
+        sections.append(
+            f"""
+    <section class="overview">
+      <h2>Overview</h2>
+      <img class="gallery-image" src="{stacked_src}" alt="Overview" loading="lazy">
+    </section>""".rstrip()
+        )
+
     for layer_idx, png_file in enumerate(png_files):
         rel_src = Path(relpath(png_file.resolve(), start=out_html.parent.resolve()))
         src = escape(rel_src.as_posix(), quote=True)
@@ -20,7 +32,7 @@ def write_layer_gallery_html(
             f"""
     <section class="layer">
       <h2>Layer {layer_idx}</h2>
-      <img src="{src}" alt="Layer {layer_idx}" loading="lazy">
+      <img class="gallery-image" src="{src}" alt="Layer {layer_idx}" loading="lazy">
     </section>""".rstrip()
         )
 
@@ -45,6 +57,7 @@ def write_layer_gallery_html(
         max-width: 100%;
       }}
       .layer {{ margin: 0 0 1.5rem; }}
+      .overview {{ margin: 0 0 2rem; }}
       #overlay {{
         align-items: center;
         background: rgba(0, 0, 0, 0.8);
@@ -83,14 +96,14 @@ def write_layer_gallery_html(
       const overlay = document.getElementById("overlay");
       const overlayImage = document.getElementById("overlay-image");
       const closeButton = document.getElementById("overlay-close");
-      const layerImages = document.querySelectorAll("section.layer img");
+      const galleryImages = document.querySelectorAll("img.gallery-image");
 
       function closeOverlay() {{
         overlay.setAttribute("aria-hidden", "true");
         overlayImage.removeAttribute("src");
       }}
 
-      layerImages.forEach((img) => {{
+      galleryImages.forEach((img) => {{
         img.addEventListener("click", () => {{
           overlayImage.setAttribute("src", img.getAttribute("src"));
           overlay.setAttribute("aria-hidden", "false");

@@ -34,6 +34,7 @@ def main() -> int:
 
     print(render_layout_ascii(layout, mode=args.ascii_mode))
     layer_pngs: list[Path] = []
+    stacked_path: Path | None = None
     if args.png_out is not None:
         files = render_layout_png_layers(
             layout,
@@ -48,12 +49,6 @@ def main() -> int:
             print(f"- {path}")
         layer_pngs = files
 
-    if args.html_out is not None:
-        if layer_pngs:
-            write_layer_gallery_html(out_html=args.html_out, png_files=layer_pngs)
-            print(f"\nHTML gallery:\n- {args.html_out}")
-        else:
-            print("\nSkipping HTML gallery: no layer PNGs available (use --png-out).")
     if args.png_stacked_out is not None:
         stacked_path = render_layout_png_stacked(
             layout,
@@ -65,6 +60,17 @@ def main() -> int:
             show_legend=args.show_legend,
         )
         print(f"\nStacked PNG:\n- {stacked_path}")
+
+    if args.html_out is not None:
+        if layer_pngs:
+            write_layer_gallery_html(
+                out_html=args.html_out,
+                png_files=layer_pngs,
+                stacked_png=stacked_path,
+            )
+            print(f"\nHTML gallery:\n- {args.html_out}")
+        else:
+            print("\nSkipping HTML gallery: no layer PNGs available (use --png-out).")
     return 0
 
 
