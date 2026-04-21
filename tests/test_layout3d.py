@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from layout3d import (
     LayoutPipeline,
     LayoutValidationError,
@@ -12,6 +14,7 @@ from layout3d import (
     parse_layout_json,
 )
 from layout3d.normalize import normalize_layout
+from layout3d.representation import build_tile_representation
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -103,6 +106,16 @@ def test_duplicate_wire_tile_on_same_coord() -> None:
     assert "DUPLICATE_WIRE_TILE_COORD" in _codes(report)
 
 
+def test_duplicate_wire_tile_coord_never_silently_overwritten_in_representation() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    second = dict(data["wireTiles"][0])
+    second["wireTileId"] = "wt2"
+    data["wireTiles"].append(second)
+    parsed = parse_layout(data)
+    with pytest.raises(ValueError, match="duplicate wireTile coordinate"):
+        build_tile_representation(parsed)
+
+
 def test_duplicate_wire_id_in_ordered_wires() -> None:
     data = _load_json("examples/layout3d_valid_minimal.json")
     tile = data["wireTiles"][0]
@@ -116,6 +129,28 @@ def test_duplicate_wire_id_in_ordered_wires() -> None:
     )
     report = _validate(data)
     assert "DUPLICATE_WIRE_ID" in _codes(report)
+
+
+def test_device_slot_is_validated_even_without_devices() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    data["devices"] = []
+    data["deviceSlots"][0]["x"] = 999
+    report = _validate(data)
+    assert "OUT_OF_GRID" in _codes(report)
+
+
+def test_pin_grid_dimensions_must_be_positive() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    data["devices"][0]["pinGrid"] = {"cellsX": 0, "cellsY": -1}
+    report = _validate(data)
+    assert "PIN_GRID_DIMENSION" in _codes(report)
+
+
+def test_parse_error_contains_field_path() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    data["devices"][0]["pinGrid"]["cellsX"] = "2"
+    with pytest.raises(TypeError, match=r"devices\[0\]\.pinGrid\.cellsX"):
+        parse_layout(data)
 
 
 def test_pipeline_raises_structured_error() -> None:

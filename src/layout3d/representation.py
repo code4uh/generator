@@ -27,10 +27,12 @@ def build_tile_representation(layout: LayoutInstance) -> TileRepresentation:
             for pin in device.pins
         }
 
-    wire_entries = {
-        TileCoord(x=tile.x, y=tile.y, layer=tile.layer): tile.ordered_wires
-        for tile in layout.wire_tiles
-    }
+    wire_entries: dict[TileCoord, tuple[WireEntry, ...]] = {}
+    for tile in layout.wire_tiles:
+        coord = TileCoord(x=tile.x, y=tile.y, layer=tile.layer)
+        if coord in wire_entries:
+            raise ValueError(f"duplicate wireTile coordinate ({coord.x}, {coord.y}, {coord.layer})")
+        wire_entries[coord] = tile.ordered_wires
 
     return TileRepresentation(
         occupied_device_tiles=occupied,
