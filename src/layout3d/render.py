@@ -334,10 +334,11 @@ def render_png_stacked(
     pad = 20
     layer_gap = 16
     header_h = max(20, tile_px // 2)
+    legend_w = 230 if show_legend else 0
     legend_h = max(70, tile_px + 20) if show_legend else 0
 
     if stack_direction == "vertical":
-        width = pad * 2 + tile_block_w
+        width = max(pad * 2 + tile_block_w, pad * 2 + legend_w)
         height = (
             pad * 2
             + len(view.layers) * (header_h + tile_block_h)
@@ -350,6 +351,7 @@ def render_png_stacked(
             + len(view.layers) * tile_block_w
             + max(0, len(view.layers) - 1) * layer_gap
         )
+        width = max(width, pad * 2 + legend_w)
         height = pad * 2 + header_h + tile_block_h + legend_h
 
     image = Image.new("RGB", (width, height), (255, 255, 255))
@@ -377,7 +379,7 @@ def render_png_stacked(
     if show_legend:
         legend_x = pad
         legend_y = height - pad - legend_h
-        _draw_legend(draw=draw, x=legend_x, y=legend_y, width=230, height=legend_h)
+        _draw_legend(draw=draw, x=legend_x, y=legend_y, width=legend_w, height=legend_h)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     image.save(output_path)

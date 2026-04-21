@@ -14,7 +14,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Render layout JSON as ASCII and PNG")
     parser.add_argument("layout", type=Path, help="Path to layout JSON file")
     parser.add_argument("--ascii-mode", choices=["compact", "detailed"], default="compact")
-    parser.add_argument("--png-out", type=Path, default=Path("out/render"))
+    parser.add_argument("--png-out", type=Path, default=None)
     parser.add_argument("--png-stacked-out", type=Path, default=None)
     parser.add_argument("--prefix", default="layout")
     parser.add_argument("--tile-px", type=int, default=72)
@@ -31,17 +31,18 @@ def main() -> int:
     tile_px = args.tile_px if args.tile_size is None else args.tile_size
 
     print(render_layout_ascii(layout, mode=args.ascii_mode))
-    files = render_layout_png_layers(
-        layout,
-        output_dir=args.png_out,
-        prefix=args.prefix,
-        tile_size=tile_px,
-        draw_ports=args.draw_ports,
-        show_coords=args.show_coords,
-    )
-    print("\nPNG files:")
-    for path in files:
-        print(f"- {path}")
+    if args.png_out is not None:
+        files = render_layout_png_layers(
+            layout,
+            output_dir=args.png_out,
+            prefix=args.prefix,
+            tile_size=tile_px,
+            draw_ports=args.draw_ports,
+            show_coords=args.show_coords,
+        )
+        print("\nPNG files:")
+        for path in files:
+            print(f"- {path}")
     if args.png_stacked_out is not None:
         stacked_path = render_layout_png_stacked(
             layout,
