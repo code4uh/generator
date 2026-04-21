@@ -57,7 +57,7 @@ def test_ascii_detailed_snapshot_minimal_layout() -> None:
         "[  ] [D ] [  ]\n"
         "[  ] [  ] [  ]\n"
         "details:\n"
-        "  - (1,1) | device=dev1:amp | pins=[p1@(0,0)<north:0,east:1>]\n\n"
+        "  - (1,1) | device=dev1:amp | pins=[]\n\n"
         "Layer 2\n"
         "[  ] [  ] [  ]\n"
         "[  ] [  ] [  ]\n"
@@ -65,6 +65,27 @@ def test_ascii_detailed_snapshot_minimal_layout() -> None:
         "details:"
     )
 
+
+
+
+def test_build_render_view_maps_pins_to_pin_tile_layer_for_multilayer_device() -> None:
+    layout = _load_layout("examples/complex_layout.json")
+    view = build_render_view(layout)
+
+    layer0_cell = view.by_layer[0].cells[(1, 1)]
+    layer1_cell = view.by_layer[1].cells[(1, 1)]
+    layer2_cell = view.by_layer[2].cells[(1, 1)]
+    layer3_cell = view.by_layer[3].cells[(1, 1)]
+
+    assert layer0_cell.device_id == "ctrl0"
+    assert layer1_cell.device_id == "ctrl0"
+    assert layer2_cell.device_id == "ctrl0"
+    assert layer3_cell.device_id == "ctrl0"
+
+    assert {pin.pin_id for pin in layer0_cell.pins} == {"ctrl_sync"}
+    assert {pin.pin_id for pin in layer1_cell.pins} == set()
+    assert {pin.pin_id for pin in layer2_cell.pins} == {"ctrl_bus"}
+    assert {pin.pin_id for pin in layer3_cell.pins} == set()
 
 def test_render_png_layers_smoke(tmp_path: Path) -> None:
     pytest.importorskip("PIL")
