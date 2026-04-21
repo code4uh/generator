@@ -98,3 +98,30 @@ Zusätzlich unterstützt `layout3d` jetzt JSON-Ein-/Ausgabe (`parse_layout_json`
 sowie Normalisierungs-Lookups (ID-Maps, Device-Tile-Expansion, WireTile-Map pro `(x,y,layer)`).
 
 Eine kompakte Entwicklerdokumentation liegt unter `docs/layout3d-developer-note.md`.
+
+## Rendering (ASCII + PNG)
+
+Das Layout kann auf Basis der bestehenden Tile-Repräsentation gerendert werden:
+
+```python
+from pathlib import Path
+import json
+
+from layout3d import parse_layout
+from layout3d.render import build_render_view, render_ascii, render_png_layers
+
+data = json.loads(Path("examples/simple_layout.json").read_text())
+layout = parse_layout(data)
+view = build_render_view(layout)
+
+print(render_ascii(view, mode="compact"))
+print(render_ascii(view, mode="detailed"))
+
+render_png_layers(view, output_dir=Path("out/render"), prefix="simple")
+```
+
+Kleiner CLI-Demo-Einstiegspunkt:
+
+```bash
+PYTHONPATH=src python -m layout3d.render_demo examples/simple_layout.json --ascii-mode detailed --png-out out/render
+```
