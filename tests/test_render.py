@@ -84,12 +84,12 @@ def _wire_orientation_test_layout():
                     "x": 0,
                     "y": 0,
                     "layer": 0,
+                    "orientation": "horizontal",
                     "orderedWires": [
                         {
                             "wireId": "w_h",
                             "wireType": "sig",
                             "netId": "n_h",
-                            "orientation": "horizontal",
                         }
                     ],
                 },
@@ -98,12 +98,12 @@ def _wire_orientation_test_layout():
                     "x": 1,
                     "y": 0,
                     "layer": 0,
+                    "orientation": "vertical",
                     "orderedWires": [
                         {
                             "wireId": "w_v",
                             "wireType": "sig",
                             "netId": "n_v",
-                            "orientation": "vertical",
                         }
                     ],
                 },
@@ -116,6 +116,36 @@ def test_ascii_compact_uses_wire_orientation_markers() -> None:
     view = build_render_view(_wire_orientation_test_layout())
     rendered = render_ascii(view, mode="compact")
     assert "- |" in rendered
+
+
+def test_ascii_compact_uses_wire_tile_orientation_not_wire_entry() -> None:
+    layout = parse_layout(
+        {
+            "schemaVersion": 1,
+            "templateRef": "tpl/wire-orientation-tile",
+            "grid": {"cellsX": 1, "cellsY": 1, "layers": 1},
+            "deviceSlots": [],
+            "devices": [],
+            "wireTiles": [
+                {
+                    "wireTileId": "wt",
+                    "x": 0,
+                    "y": 0,
+                    "layer": 0,
+                    "orientation": "vertical",
+                    "orderedWires": [
+                        {
+                            "wireId": "w",
+                            "wireType": "sig",
+                            "netId": "n",
+                        }
+                    ],
+                }
+            ],
+        }
+    )
+    rendered = render_ascii(build_render_view(layout), mode="compact")
+    assert rendered.splitlines()[1] == "|"
 
 
 def test_render_png_layers_smoke_with_wire_orientation_markers(tmp_path: Path) -> None:

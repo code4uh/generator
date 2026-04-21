@@ -145,11 +145,31 @@ def test_duplicate_wire_id_in_ordered_wires() -> None:
             "wireId": "w1",
             "wireType": "sig",
             "netId": "n2",
-            "orientation": "vertical",
         }
     )
     report = _validate(data)
     assert "DUPLICATE_WIRE_ID" in _codes(report)
+
+
+def test_wire_tile_orientation_parsed_on_tile_level() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    parsed = parse_layout(data)
+    assert parsed.wire_tiles[0].orientation == "horizontal"
+    assert not hasattr(parsed.wire_tiles[0].ordered_wires[0], "orientation")
+
+
+def test_missing_wire_tile_orientation_raises_parse_error() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    del data["wireTiles"][0]["orientation"]
+    with pytest.raises(ParseError, match=r"wireTiles\[0\]"):
+        parse_layout(data)
+
+
+def test_invalid_wire_tile_orientation_is_reported_by_validation() -> None:
+    data = _load_json("examples/layout3d_valid_minimal.json")
+    data["wireTiles"][0]["orientation"] = "diagonal"
+    report = _validate(data)
+    assert "WIRE_ORIENTATION" in _codes(report)
 
 
 def test_device_slot_is_validated_even_without_devices() -> None:
