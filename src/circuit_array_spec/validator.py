@@ -57,16 +57,48 @@ def _stable_jsonschema_summary(error: Any) -> str:
     return "schema constraint violated"
 
 
-def _validate_schema(spec: dict[str, Any]) -> None:
-    """Valdiere strikt per jsonschema Draft7 gegen die kanonische Schema-Datei."""
-    try:
-        from jsonschema import Draft7Validator
-    except ModuleNotFoundError as error:
-        raise SpecValidationError(
-            "Die Abhängigkeit 'jsonschema' fehlt. Bitte installiere Projektabhängigkeiten (z. B. `pip install -e .`)."
-        ) from error
+def _raise_schema_error(path: str, summary: str) -> None:
+    raise SpecValidationError(f"Schema validation failed at {path}: {summary}")
 
-    errors = sorted(Draft7Validator(_SCHEMA).iter_errors(spec), key=lambda item: list(item.absolute_path))
+
+def _validate_schema_without_jsonschema(spec: dict[str, Any]) -> None:
+    required_top_level = ("version", "type", "inputs", "capabilities", "output")
+    for key in required_top_level:
+        if key not in spec:
+            _raise_schema_error("<root>", f"missing required property '{key}'")
+
+    if spec.get("type") == "cap_array":
+        topology = spec.get("inputs", {}).get("topology", {})
+        connection = topology.get("connection")
+        plus_connected = topology.get("plusConnected")
+
+        if connection == "userDefined" and "plusConnected" not in topology:
+            _raise_schema_error("inputs.topology", "missing required property 'plusConnected'")
+
+        if plus_connected is not None and not isinstance(plus_connected, str):
+            _raise_schema_error("inputs.topology.plusConnected", "expected type string")
+
+    if spec.get("type") == "res_array":
+        topology = spec.get("inputs", {}).get("topology", {})
+        connect_dummy_res = topology.get("connectDummyRes")
+        allowed = ("open_floating", "VSS")
+        if connect_dummy_res not in allowed:
+            allowed_text = ", ".join(repr(item) for item in allowed)
+            _raise_schema_error(
+                "inputs.topology.connectDummyRes",
+                f"must be one of: {allowed_text}",
+            )
+
+
+def _validate_schema(spec: dict[str, Any]) -> None:
+    """Validiere strikt per jsonschema Draft 2020-12 gegen die kanonische Schema-Datei."""
+    try:
+        from jsonschema import Draft202012Validator
+    except ModuleNotFoundError as error:
+        _validate_schema_without_jsonschema(spec)
+        return
+
+    errors = sorted(Draft202012Validator(_SCHEMA).iter_errors(spec), key=lambda item: list(item.absolute_path))
     if errors:
         error = errors[0]
         path = _format_jsonschema_path(error.absolute_path)

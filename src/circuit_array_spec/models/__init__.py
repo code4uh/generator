@@ -1,9 +1,19 @@
-from .cap_array import CapArraySpec, CapArraySpecModel
-from .res_array import ResArraySpec, ResArraySpecModel
+from .lightweight import (
+    CapArraySpecModel,
+    CapPlacement,
+    CapTopology,
+    Output,
+    ResArraySpecModel,
+    ResPlacement,
+    ResTopology,
+)
 
 __all__ = [
-    "CapArraySpec",
-    "ResArraySpec",
     "CapArraySpecModel",
     "ResArraySpecModel",
+    "CapTopology",
+    "CapPlacement",
+    "ResTopology",
+    "ResPlacement",
+    "Output",
 ]

@@ -12,7 +12,7 @@ pip install -e .
 
 Die Validierung erfolgt in zwei Schritten:
 
-1. **JSON-Schema-Validierung** mit `jsonschema` gegen `spec/schema/circuit-array.schema.json`
+1. **JSON-Schema-Validierung** mit `jsonschema` (Draft 2020-12) gegen `spec/schema/circuit-array.schema.json`
 2. **Semantische Validierung** für zusätzliche Fachregeln (z. B. `plusConnected`, `placement`-Regeln)
 
 ```python
@@ -65,3 +65,13 @@ pytest -q
 Wenn Markdown-Spec und JSON-Schema abweichen, behandelt diese Implementierung die
 Markdown-Spec als fachliche Quelle und ergänzt dafür semantische Prüfungen
 zusätzlich zum Schema.
+
+
+## Netlist-Generierung
+
+Die Netlist-Ausgabe ist SPICE-ähnlich und nutzt Defaultwerte:
+
+- `cap_array`: `1f`, `W=1u`, `L=1u`
+- `res_array`: `1k`, `W=1u`, `L=1u`
+
+Für `cap_array` mit `connectDummyCaps = "open_floating"` werden keine Dummy-/Boundary-Cap-Zeilen erzeugt.

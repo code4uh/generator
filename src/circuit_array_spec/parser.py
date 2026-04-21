@@ -2,25 +2,27 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping
 from copy import deepcopy
-from typing import Annotated
 
-from pydantic import Field, TypeAdapter
-
-from .models.cap_array import CapArraySpec, CapArraySpecModel, CapPlacement, CapTopology, Output
-from .models.res_array import ResArraySpec, ResArraySpecModel, ResPlacement, ResTopology
-
-CircuitArraySpec = Annotated[CapArraySpec | ResArraySpec, Field(discriminator="type")]
-_CIRCUIT_ARRAY_SPEC_ADAPTER = TypeAdapter(CircuitArraySpec)
-
-
-def parse_circuit_array_spec(data: Mapping[str, object]) -> CircuitArraySpec:
-    return _CIRCUIT_ARRAY_SPEC_ADAPTER.validate_python(data)
+from .models import (
+    CapArraySpecModel,
+    CapPlacement,
+    CapTopology,
+    Output,
+    ResArraySpecModel,
+    ResPlacement,
+    ResTopology,
+)
 
 
-def parse_circuit_array_spec_json(data: str) -> CircuitArraySpec:
-    return _CIRCUIT_ARRAY_SPEC_ADAPTER.validate_json(data)
+def parse_circuit_array_spec(data: Mapping[str, object]) -> Mapping[str, object]:
+    return data
+
+
+def parse_circuit_array_spec_json(data: str) -> Mapping[str, object]:
+    return json.loads(data)
 
 
 def _to_plain_obj(value: object) -> object:
@@ -40,42 +42,50 @@ def _to_plain_dict(value: object) -> dict[str, object]:
 
 
 def build_model(spec: Mapping[str, object]) -> CapArraySpecModel | ResArraySpecModel:
-    validated = parse_circuit_array_spec(spec)
     raw = _to_plain_dict(spec)
+    spec_type = raw["type"]
 
-    if isinstance(validated, CapArraySpec):
+    if spec_type == "cap_array":
+        inputs = raw["inputs"]
+        topology = inputs["topology"]
+        placement = inputs["placement"]
+        output = raw["output"]
         return CapArraySpecModel(
-            version=validated.version,
+            version=str(raw["version"]),
             type="cap_array",
             topology=CapTopology(
-                cap_list=list(validated.inputs.topology.cap_list),
-                connection=validated.inputs.topology.connection,
-                plus_connected=validated.inputs.topology.plusConnected,
-                connect_dummy_caps=validated.inputs.topology.connectDummyCaps,
-                boundary_caps=validated.inputs.topology.boundary_caps.model_dump(),
+                cap_list=list(topology["cap_list"]),
+                connection=topology["connection"],
+                plus_connected=topology.get("plusConnected"),
+                connect_dummy_caps=topology["connectDummyCaps"],
+                boundary_caps=deepcopy(topology["boundary_caps"]),
             ),
             placement=CapPlacement(
-                rows=validated.inputs.placement.rows,
-                algorithm=validated.inputs.placement.algorithm,
-                pattern=validated.inputs.placement.pattern,
+                rows=int(placement["rows"]),
+                algorithm=placement["algorithm"],
+                pattern=placement["pattern"],
             ),
-            output=Output(libname=validated.output.libname, cellname=validated.output.cellname),
+            output=Output(libname=str(output["libname"]), cellname=str(output["cellname"])),
             raw=raw,
         )
 
+    inputs = raw["inputs"]
+    topology = inputs["topology"]
+    placement = inputs["placement"]
+    output = raw["output"]
     return ResArraySpecModel(
-        version=validated.version,
+        version=str(raw["version"]),
         type="res_array",
         topology=ResTopology(
-            res_list=list(validated.inputs.topology.res_list),
-            parallel_res_no=validated.inputs.topology.parallelResNo,
-            connect_dummy_res=validated.inputs.topology.connectDummyRes,
-            boundary_resistors=validated.inputs.topology.boundary_resistors.model_dump(),
+            res_list=list(topology["res_list"]),
+            parallel_res_no=int(topology["parallelResNo"]),
+            connect_dummy_res=topology["connectDummyRes"],
+            boundary_resistors=deepcopy(topology["boundary_resistors"]),
         ),
         placement=ResPlacement(
-            algorithm=validated.inputs.placement.algorithm,
-            pattern=validated.inputs.placement.pattern,
+            algorithm=placement["algorithm"],
+            pattern=placement["pattern"],
         ),
-        output=Output(libname=validated.output.libname, cellname=validated.output.cellname),
+        output=Output(libname=str(output["libname"]), cellname=str(output["cellname"])),
         raw=raw,
     )

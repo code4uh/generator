@@ -7,7 +7,6 @@
         1
       ],
       "connection": "userDefined",
-      "plusConnected": null,
       "connectDummyCaps": "open_floating",
       "boundary_caps": {
         "left": false,
