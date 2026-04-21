@@ -29,7 +29,7 @@ def test_ascii_compact_snapshot_minimal_layout() -> None:
     assert rendered == (
         "Layer 0\n"
         ". . .\n"
-        ". D W\n"
+        ". D -\n"
         ". . .\n\n"
         "Layer 1\n"
         ". . .\n"
@@ -51,7 +51,7 @@ def test_ascii_detailed_snapshot_minimal_layout() -> None:
     assert rendered == (
         "Layer 0\n"
         "[  ] [  ] [  ]\n"
-        "[  ] [D ] [ W]\n"
+        "[  ] [D ] [ -]\n"
         "[  ] [  ] [  ]\n"
         "details:\n"
         "  - (1,1) | device=dev1:amp | pins=[p1@(0,0)<north:0,east:1>]\n"
@@ -68,6 +68,66 @@ def test_ascii_detailed_snapshot_minimal_layout() -> None:
         "[  ] [  ] [  ]\n"
         "details:"
     )
+
+
+def _wire_orientation_test_layout():
+    return parse_layout(
+        {
+            "schemaVersion": 1,
+            "templateRef": "tpl/wire-orientation",
+            "grid": {"cellsX": 2, "cellsY": 1, "layers": 1},
+            "deviceSlots": [],
+            "devices": [],
+            "wireTiles": [
+                {
+                    "wireTileId": "wt_h",
+                    "x": 0,
+                    "y": 0,
+                    "layer": 0,
+                    "orderedWires": [
+                        {
+                            "wireId": "w_h",
+                            "wireType": "sig",
+                            "netId": "n_h",
+                            "orientation": "horizontal",
+                        }
+                    ],
+                },
+                {
+                    "wireTileId": "wt_v",
+                    "x": 1,
+                    "y": 0,
+                    "layer": 0,
+                    "orderedWires": [
+                        {
+                            "wireId": "w_v",
+                            "wireType": "sig",
+                            "netId": "n_v",
+                            "orientation": "vertical",
+                        }
+                    ],
+                },
+            ],
+        }
+    )
+
+
+def test_ascii_compact_uses_wire_orientation_markers() -> None:
+    view = build_render_view(_wire_orientation_test_layout())
+    rendered = render_ascii(view, mode="compact")
+    assert "- |" in rendered
+
+
+def test_render_png_layers_smoke_with_wire_orientation_markers(tmp_path: Path) -> None:
+    pytest.importorskip("PIL")
+
+    view = build_render_view(_wire_orientation_test_layout())
+    paths = render_png_layers(view, output_dir=tmp_path, prefix="wire_orientation", tile_size=48)
+
+    assert len(paths) == 1
+    assert paths[0].exists()
+    assert paths[0].suffix == ".png"
+    assert paths[0].stat().st_size > 0
 
 
 
