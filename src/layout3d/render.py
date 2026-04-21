@@ -156,18 +156,38 @@ def _compact_token(cell: RenderCellView) -> str:
     if cell.has_device:
         return "D"
     if cell.has_wires:
+        orientation = _wire_orientation(cell)
+        if orientation == "horizontal":
+            return "-"
+        if orientation == "vertical":
+            return "|"
         return "W"
     return "."
 
 
 def _detailed_token(cell: RenderCellView) -> str:
+    orientation = _wire_orientation(cell)
     if cell.has_device and cell.has_wires:
+        if orientation == "horizontal":
+            return "[D-]"
+        if orientation == "vertical":
+            return "[D|]"
         return "[DW]"
     if cell.has_device:
         return "[D ]"
     if cell.has_wires:
+        if orientation == "horizontal":
+            return "[ -]"
+        if orientation == "vertical":
+            return "[ |]"
         return "[ W]"
     return "[  ]"
+
+
+def _wire_orientation(cell: RenderCellView) -> str | None:
+    if not cell.wires:
+        return None
+    return cell.wires[0].orientation
 
 
 def _pins_repr(cell: RenderCellView) -> str:
@@ -282,6 +302,24 @@ def _draw_layer_cells(
             draw.rectangle((left + 2, top + 2, right - 2, bottom - 2), fill=(188, 224, 255))
         if cell.has_wires:
             draw.rectangle((left + 8, top + 8, right - 8, bottom - 8), outline=(227, 126, 55), width=3)
+            orientation = _wire_orientation(cell)
+            center_x = left + tile_px // 2
+            center_y = top + tile_px // 2
+            half_len = max(3, int(tile_px * 0.28))
+            marker_width = max(1, tile_px // 40)
+            marker_color = (95, 95, 95)
+            if orientation == "horizontal":
+                draw.line(
+                    (center_x - half_len, center_y, center_x + half_len, center_y),
+                    fill=marker_color,
+                    width=marker_width,
+                )
+            elif orientation == "vertical":
+                draw.line(
+                    (center_x, center_y - half_len, center_x, center_y + half_len),
+                    fill=marker_color,
+                    width=marker_width,
+                )
 
         for pin in cell.pins:
             px = left + int(((pin.local_px + 0.5) / pin.pin_grid_x) * tile_px)
