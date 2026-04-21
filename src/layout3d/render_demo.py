@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 
 from .parser import parse_layout
+from .render_html import write_layer_gallery_html
 from .render import render_layout_ascii, render_layout_png_layers, render_layout_png_stacked
 
 
@@ -15,6 +16,7 @@ def main() -> int:
     parser.add_argument("layout", type=Path, help="Path to layout JSON file")
     parser.add_argument("--ascii-mode", choices=["compact", "detailed"], default="compact")
     parser.add_argument("--png-out", type=Path, default=None)
+    parser.add_argument("--html-out", type=Path, default=None)
     parser.add_argument("--png-stacked-out", type=Path, default=None)
     parser.add_argument("--prefix", default="layout")
     parser.add_argument("--tile-px", type=int, default=72)
@@ -31,6 +33,7 @@ def main() -> int:
     tile_px = args.tile_px if args.tile_size is None else args.tile_size
 
     print(render_layout_ascii(layout, mode=args.ascii_mode))
+    layer_pngs: list[Path] = []
     if args.png_out is not None:
         files = render_layout_png_layers(
             layout,
@@ -43,6 +46,14 @@ def main() -> int:
         print("\nPNG files:")
         for path in files:
             print(f"- {path}")
+        layer_pngs = files
+
+    if args.html_out is not None:
+        if layer_pngs:
+            write_layer_gallery_html(out_html=args.html_out, png_files=layer_pngs)
+            print(f"\nHTML gallery:\n- {args.html_out}")
+        else:
+            print("\nSkipping HTML gallery: no layer PNGs available (use --png-out).")
     if args.png_stacked_out is not None:
         stacked_path = render_layout_png_stacked(
             layout,
