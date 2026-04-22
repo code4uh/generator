@@ -101,19 +101,42 @@ def test_cap_grid_generator_uses_user_pattern_shape() -> None:
     assert classification.tile_kind_at(1, 1, 0) == "wire"
 
 
-def test_cap_grid_generator_boundary_size_minimum_supported_v1_as_thickness_one() -> None:
-    spec = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
-    spec["inputs"]["topology"]["boundary_caps"].update(
-        {"left": True, "right": False, "top": True, "bottom": False, "boundary_size": "Minimum"}
+def test_cap_grid_generator_boundary_device_size_is_metadata_only_in_v1_geometry() -> None:
+    spec_minimum = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
+    spec_minimum["inputs"]["topology"]["boundary_caps"].update(
+        {"left": True, "right": False, "top": True, "bottom": False, "boundary_device_size": "Minimum"}
+    )
+    spec_unit = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
+    spec_unit["inputs"]["topology"]["boundary_caps"].update(
+        {"left": True, "right": False, "top": True, "bottom": False, "boundary_device_size": "Unit"}
     )
 
-    classification = CapArrayGridGenerator().generate(to_cap_model(spec))
+    minimum = CapArrayGridGenerator().generate(to_cap_model(spec_minimum))
+    unit = CapArrayGridGenerator().generate(to_cap_model(spec_unit))
 
-    assert classification.cells_x == 2
-    assert classification.cells_y == 2
-    assert classification.tile_kind_at(0, 0, 0) == "device"
-    assert classification.tile_kind_at(1, 0, 0) == "device"
-    assert classification.tile_kind_at(0, 1, 0) == "device"
+    assert minimum.cells_x == unit.cells_x == 2
+    assert minimum.cells_y == unit.cells_y == 2
+    assert minimum.tiles == unit.tiles
+
+
+def test_cap_grid_generator_boundary_side_flags_control_v1_footprint() -> None:
+    spec_no_boundary = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
+    spec_no_boundary["inputs"]["topology"]["boundary_caps"].update(
+        {"left": False, "right": False, "top": False, "bottom": False, "boundary_device_size": "Unit"}
+    )
+    spec_left_top = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
+    spec_left_top["inputs"]["topology"]["boundary_caps"].update(
+        {"left": True, "right": False, "top": True, "bottom": False, "boundary_device_size": "Unit"}
+    )
+
+    no_boundary = CapArrayGridGenerator().generate(to_cap_model(spec_no_boundary))
+    left_top = CapArrayGridGenerator().generate(to_cap_model(spec_left_top))
+
+    assert no_boundary.cells_x == 1
+    assert no_boundary.cells_y == 1
+    assert left_top.cells_x == 2
+    assert left_top.cells_y == 2
+    assert no_boundary.tiles != left_top.tiles
 
 
 def test_cap_grid_generator_connect_dummy_caps_is_v1_noop_for_tile_kind() -> None:
@@ -129,11 +152,11 @@ def test_cap_grid_generator_connect_dummy_caps_is_v1_noop_for_tile_kind() -> Non
     assert open_class.tiles == short_class.tiles
 
 
-def test_cap_grid_generator_rejects_unknown_boundary_size() -> None:
+def test_cap_grid_generator_rejects_unknown_boundary_device_size() -> None:
     spec = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
-    spec["inputs"]["topology"]["boundary_caps"]["boundary_size"] = "XL"
+    spec["inputs"]["topology"]["boundary_caps"]["boundary_device_size"] = "XL"
 
-    with pytest.raises(ValueError, match="unsupported boundary_size"):
+    with pytest.raises(ValueError, match="unsupported boundary_device_size"):
         CapArrayGridGenerator().generate(to_cap_model(spec))
 
 

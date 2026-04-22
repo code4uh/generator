@@ -1,4 +1,4 @@
-"""Parsing helpers and backward-compatible model builder."""
+"""Parsing helpers and strict model builder."""
 
 from __future__ import annotations
 

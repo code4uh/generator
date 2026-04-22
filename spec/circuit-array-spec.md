@@ -80,7 +80,7 @@ Ein `cap_array` ist eine Sammlung logischer Kapazitäten, wobei jede Kapazität 
     "right": true,
     "top": false,
     "bottom": true,
-    "boundary_size": "Unit"
+    "boundary_device_size": "Unit"
   }
 }
 ```
@@ -158,12 +158,12 @@ Zulässige Werte:
   "right": true,
   "top": false,
   "bottom": true,
-  "boundary_size": "Unit"
+  "boundary_device_size": "Unit"
 }
 ```
 
 - `left/right/top/bottom`: Boundary-Caps auf jeweiliger Seite aktiv/inaktiv
-- `boundary_size`: `Unit` oder `Minimum`
+- `boundary_device_size`: `Unit` oder `Minimum`
 
 ### 3.2 placement
 
@@ -323,7 +323,7 @@ Jeder serielle Widerstand wird durch `parallelResNo` parallele primitive Widerst
     "right": true,
     "top": false,
     "bottom": true,
-    "boundary_size": "Unit"
+    "boundary_device_size": "Unit"
   }
 }
 ```
@@ -366,7 +366,7 @@ Bedeutung:
   "right": true,
   "top": false,
   "bottom": true,
-  "boundary_size": "Unit"
+  "boundary_device_size": "Unit"
 }
 ```
 

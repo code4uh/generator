@@ -35,6 +35,24 @@ def test_invalid_res_connect_dummy() -> None:
         validate_spec(spec)
 
 
+def test_cap_boundary_size_legacy_field_is_rejected() -> None:
+    spec = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
+    boundary = spec["inputs"]["topology"]["boundary_caps"]
+    boundary["boundary_size"] = boundary.pop("boundary_device_size")
+
+    with pytest.raises(SpecValidationError, match="boundary_device_size|additional properties"):
+        validate_spec(spec)
+
+
+def test_res_boundary_size_legacy_field_is_rejected() -> None:
+    spec = load_fixture("spec/fixtures/valid/res_array_minimal.json")
+    boundary = spec["inputs"]["topology"]["boundary_resistors"]
+    boundary["boundary_size"] = boundary.pop("boundary_device_size")
+
+    with pytest.raises(SpecValidationError, match="boundary_device_size|additional properties"):
+        validate_spec(spec)
+
+
 def test_oneof_error_includes_sub_causes() -> None:
     pytest.importorskip("jsonschema")
     spec = {

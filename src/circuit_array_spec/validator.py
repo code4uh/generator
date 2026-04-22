@@ -84,8 +84,20 @@ def _validate_schema_without_jsonschema(spec: dict[str, Any]) -> None:
 
     if spec.get("type") == "cap_array":
         topology = spec.get("inputs", {}).get("topology", {})
+        boundary_caps = topology.get("boundary_caps", {})
         connection = topology.get("connection")
         plus_connected = topology.get("plusConnected")
+
+        if "boundary_device_size" not in boundary_caps:
+            _raise_schema_error(
+                "inputs.topology.boundary_caps",
+                "missing required property 'boundary_device_size'",
+            )
+        if "boundary_size" in boundary_caps:
+            _raise_schema_error(
+                "inputs.topology.boundary_caps",
+                "additional properties not allowed",
+            )
 
         if connection == "userDefined" and "plusConnected" not in topology:
             _raise_schema_error("inputs.topology", "missing required property 'plusConnected'")
@@ -95,6 +107,7 @@ def _validate_schema_without_jsonschema(spec: dict[str, Any]) -> None:
 
     if spec.get("type") == "res_array":
         topology = spec.get("inputs", {}).get("topology", {})
+        boundary_resistors = topology.get("boundary_resistors", {})
         connect_dummy_res = topology.get("connectDummyRes")
         allowed = ("open_floating", "VSS")
         if connect_dummy_res not in allowed:
@@ -102,6 +115,16 @@ def _validate_schema_without_jsonschema(spec: dict[str, Any]) -> None:
             _raise_schema_error(
                 "inputs.topology.connectDummyRes",
                 f"must be one of: {allowed_text}",
+            )
+        if "boundary_device_size" not in boundary_resistors:
+            _raise_schema_error(
+                "inputs.topology.boundary_resistors",
+                "missing required property 'boundary_device_size'",
+            )
+        if "boundary_size" in boundary_resistors:
+            _raise_schema_error(
+                "inputs.topology.boundary_resistors",
+                "additional properties not allowed",
             )
 
 

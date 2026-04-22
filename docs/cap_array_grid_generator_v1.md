@@ -4,7 +4,7 @@
 
 - `topology.cap_list`
 - `topology.boundary_caps.left/right/top/bottom`
-- `topology.boundary_caps.boundary_size`
+- `topology.boundary_caps.boundary_device_size`
 - `topology.connect_dummy_caps` (in V1 explizit gelesen, aber ohne Einfluss auf TileKind)
 - `placement.rows`
 - `placement.algorithm`
@@ -24,5 +24,8 @@
 
 ## Bewusst eingeschränkt in V1
 
-- `boundary_caps.boundary_size`: aktuell diskret auf Randdicke `1` normalisiert (für `Unit` und `Minimum`).
+- `boundary_caps.boundary_device_size`: Boundary-Device-Größen-/Typ-Metadatum (`Unit` oder `Minimum`);
+  wird in V1 validiert/gelesen, verändert aber die Tile-Geometrie nicht.
+- Geometrische Boundary-Platzierung in V1 wird ausschließlich über
+  `boundary_caps.left/right/top/bottom` gesteuert.
 - `connect_dummy_caps`: hat in V1 keinen Einfluss auf Device/Wire-TileKind (Routing/Netzlogik ist out of scope).
