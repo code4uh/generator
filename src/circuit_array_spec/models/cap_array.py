@@ -43,7 +43,7 @@ class CapBoundaryCaps(StrictModel):
     right: bool
     top: bool
     bottom: bool
-    boundary_size: BoundarySize
+    boundary_device_size: BoundarySize
 
 
 class PydanticCapTopology(StrictModel):

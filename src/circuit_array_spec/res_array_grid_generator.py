@@ -10,8 +10,8 @@ V1 layer rule:
 
 V1 notes:
 - `placement.algorithm` is currently expected to be `side-by-side` for res arrays.
-- `boundary_resistors.boundary_size` is normalized to thickness=1 for supported
-  values (`Unit`, `Minimum`) because no physical metric is modeled in V1.
+- `boundary_resistors.boundary_device_size` is validated/acknowledged as boundary-device
+  metadata (`Unit`, `Minimum`), but does not change V1 tile geometry.
 - `connect_dummy_res` does not change tile kinds in V1; it is treated as a
   deliberate no-op for this first classification stage.
 """
@@ -50,11 +50,14 @@ def _plan_device_tiles_xy(spec: ResArraySpecModel) -> tuple[int, int, set[GridXY
     core_cols, core_rows, core_device_xy = _plan_core_device_tiles_xy(spec)
 
     boundary = spec.topology.boundary_resistors
-    boundary_thickness = _boundary_thickness_from_size(boundary["boundary_size"])
-    left = boundary_thickness if bool(boundary["left"]) else 0
-    right = boundary_thickness if bool(boundary["right"]) else 0
-    top = boundary_thickness if bool(boundary["top"]) else 0
-    bottom = boundary_thickness if bool(boundary["bottom"]) else 0
+    _validate_boundary_device_size_semantic(boundary["boundary_device_size"])
+
+    # V1 geometry is side-flag driven only: each enabled side contributes one
+    # boundary device ring. `boundary_device_size` is intentionally deferred metadata.
+    left = 1 if bool(boundary["left"]) else 0
+    right = 1 if bool(boundary["right"]) else 0
+    top = 1 if bool(boundary["top"]) else 0
+    bottom = 1 if bool(boundary["bottom"]) else 0
 
     cells_x = core_cols + left + right
     cells_y = core_rows + top + bottom
@@ -85,10 +88,10 @@ def _plan_core_device_tiles_xy(spec: ResArraySpecModel) -> tuple[int, int, set[G
     return cols, rows, {(x, 0) for x in range(cols)}
 
 
-def _boundary_thickness_from_size(boundary_size: object) -> int:
-    if boundary_size in ("Unit", "Minimum"):
-        return 1
-    raise ValueError(f"unsupported boundary_size for V1 classification: {boundary_size!r}")
+def _validate_boundary_device_size_semantic(boundary_device_size: object) -> None:
+    if boundary_device_size in ("Unit", "Minimum"):
+        return
+    raise ValueError(f"unsupported boundary_device_size for V1 classification: {boundary_device_size!r}")
 
 
 def _plan_boundary_device_tiles_xy(

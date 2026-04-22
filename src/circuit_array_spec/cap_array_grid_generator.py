@@ -9,8 +9,8 @@ V1 layer rule:
 - the same XY classification is copied to every layer
 
 V1 notes:
-- `boundary_caps.boundary_size` is intentionally normalized to thickness=1 for both
-  supported values (`Unit`, `Minimum`) because no physical metric is modeled yet.
+- `boundary_caps.boundary_device_size` is validated/acknowledged as boundary-device metadata
+  (`Unit`, `Minimum`), but does not change V1 tile geometry.
 - `connect_dummy_caps` does not change tile kinds in V1; it is validated/read and
   documented as a no-op for classification (electrical connectivity is out of scope).
 - `common_centroid` uses a simple center-first placement heuristic (not an analog-
@@ -53,11 +53,14 @@ def _plan_device_tiles_xy(spec: CapArraySpecModel) -> tuple[int, int, set[GridXY
     core_cols, core_rows, core_device_xy = _plan_core_device_tiles_xy(spec)
 
     boundary = spec.topology.boundary_caps
-    boundary_thickness = _boundary_thickness_from_size(boundary["boundary_size"])
-    left = boundary_thickness if bool(boundary["left"]) else 0
-    right = boundary_thickness if bool(boundary["right"]) else 0
-    top = boundary_thickness if bool(boundary["top"]) else 0
-    bottom = boundary_thickness if bool(boundary["bottom"]) else 0
+    _validate_boundary_device_size_semantic(boundary["boundary_device_size"])
+
+    # V1 geometry is side-flag driven only: each enabled side contributes one
+    # boundary device ring. `boundary_device_size` is intentionally deferred metadata.
+    left = 1 if bool(boundary["left"]) else 0
+    right = 1 if bool(boundary["right"]) else 0
+    top = 1 if bool(boundary["top"]) else 0
+    bottom = 1 if bool(boundary["bottom"]) else 0
 
     cells_x = core_cols + left + right
     cells_y = core_rows + top + bottom
@@ -77,10 +80,10 @@ def _plan_device_tiles_xy(spec: CapArraySpecModel) -> tuple[int, int, set[GridXY
     return cells_x, cells_y, shifted_core | boundary_device_xy
 
 
-def _boundary_thickness_from_size(boundary_size: object) -> int:
-    if boundary_size in ("Unit", "Minimum"):
-        return 1
-    raise ValueError(f"unsupported boundary_size for V1 classification: {boundary_size!r}")
+def _validate_boundary_device_size_semantic(boundary_device_size: object) -> None:
+    if boundary_device_size in ("Unit", "Minimum"):
+        return
+    raise ValueError(f"unsupported boundary_device_size for V1 classification: {boundary_device_size!r}")
 
 
 def _plan_core_device_tiles_xy(spec: CapArraySpecModel) -> tuple[int, int, set[GridXY]]:

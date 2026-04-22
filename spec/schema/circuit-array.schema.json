@@ -107,7 +107,7 @@
         "none"
       ]
     },
-    "boundarySize": {
+    "boundaryDeviceSize": {
       "type": "string",
       "enum": [
         "Unit",
@@ -282,7 +282,7 @@
         "right",
         "top",
         "bottom",
-        "boundary_size"
+        "boundary_device_size"
       ],
       "additionalProperties": false,
       "properties": {
@@ -298,8 +298,8 @@
         "bottom": {
           "type": "boolean"
         },
-        "boundary_size": {
-          "$ref": "#/$defs/boundarySize"
+        "boundary_device_size": {
+          "$ref": "#/$defs/boundaryDeviceSize"
         }
       }
     },
@@ -310,7 +310,7 @@
         "right",
         "top",
         "bottom",
-        "boundary_size"
+        "boundary_device_size"
       ],
       "additionalProperties": false,
       "properties": {
@@ -326,8 +326,8 @@
         "bottom": {
           "type": "boolean"
         },
-        "boundary_size": {
-          "$ref": "#/$defs/boundarySize"
+        "boundary_device_size": {
+          "$ref": "#/$defs/boundaryDeviceSize"
         }
       }
     },
