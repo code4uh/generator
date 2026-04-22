@@ -11,6 +11,7 @@ from .layout_skeleton import (
     GeneratedLayoutSkeleton,
     GeneratedWireCell,
 )
+from .device_semantic import EnrichedGeneratedLayout, GeneratedDeviceSemantic
 from .lightweight import (
     CapArraySpecModel,
     CapPlacement,
@@ -38,4 +39,6 @@ __all__ = [
     "GeneratedDeviceStack",
     "GeneratedWireCell",
     "GeneratedLayoutSkeleton",
+    "GeneratedDeviceSemantic",
+    "EnrichedGeneratedLayout",
 ]
