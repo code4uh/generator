@@ -25,6 +25,7 @@ from .models import BoundaryDeviceSize, CapArraySpecModel
 from .models.grid_classification import GeneratedGridClassification, TileKind, iter_grid_coordinates
 
 GridXY = tuple[int, int]
+GroupByXY = dict[GridXY, int | None]
 
 
 class CapArrayGridGenerator:
@@ -34,13 +35,20 @@ class CapArrayGridGenerator:
         if layers < 1:
             raise ValueError("layers must be >= 1")
 
-        cells_x, cells_y, device_xy = _plan_device_tiles_xy(spec)
+        cells_x, cells_y, group_index_by_xy = _plan_device_tiles_xy(spec)
+        device_xy = set(group_index_by_xy)
 
         tiles: dict[tuple[int, int, int], TileKind] = {}
         for x, y, layer in iter_grid_coordinates(cells_x=cells_x, cells_y=cells_y, layers=layers):
             tiles[(x, y, layer)] = "device" if (x, y) in device_xy else "wire"
 
-        return GeneratedGridClassification(cells_x=cells_x, cells_y=cells_y, layers=layers, tiles=tiles)
+        return GeneratedGridClassification(
+            cells_x=cells_x,
+            cells_y=cells_y,
+            layers=layers,
+            tiles=tiles,
+            group_index_by_xy=group_index_by_xy,
+        )
 
     def generate_tile_classification(
         self, spec: CapArraySpecModel, *, layers: int = 1
@@ -49,8 +57,8 @@ class CapArrayGridGenerator:
         return self.generate(spec, layers=layers)
 
 
-def _plan_device_tiles_xy(spec: CapArraySpecModel) -> tuple[int, int, set[GridXY]]:
-    core_cols, core_rows, core_device_xy = _plan_core_device_tiles_xy(spec)
+def _plan_device_tiles_xy(spec: CapArraySpecModel) -> tuple[int, int, GroupByXY]:
+    core_cols, core_rows, core_group_by_xy = _plan_core_device_tiles_xy(spec)
 
     boundary = spec.topology.boundary_caps
     _validate_boundary_device_size_semantic(boundary["boundary_device_size"])
@@ -65,8 +73,8 @@ def _plan_device_tiles_xy(spec: CapArraySpecModel) -> tuple[int, int, set[GridXY
     cells_x = core_cols + left + right
     cells_y = core_rows + top + bottom
 
-    shifted_core = {(x + left, y + top) for (x, y) in core_device_xy}
-    boundary_device_xy = _plan_boundary_device_tiles_xy(
+    shifted_core: GroupByXY = {(x + left, y + top): group for (x, y), group in core_group_by_xy.items()}
+    boundary_group_by_xy = _plan_boundary_device_tiles_xy(
         cells_x=cells_x,
         cells_y=cells_y,
         left_thickness=left,
@@ -77,7 +85,7 @@ def _plan_device_tiles_xy(spec: CapArraySpecModel) -> tuple[int, int, set[GridXY
 
     _ = spec.topology.connect_dummy_caps
 
-    return cells_x, cells_y, shifted_core | boundary_device_xy
+    return cells_x, cells_y, shifted_core | boundary_group_by_xy
 
 
 def _validate_boundary_device_size_semantic(boundary_device_size: BoundaryDeviceSize) -> None:
@@ -86,22 +94,30 @@ def _validate_boundary_device_size_semantic(boundary_device_size: BoundaryDevice
     raise ValueError(f"unsupported boundary_device_size for V1 classification: {boundary_device_size!r}")
 
 
-def _plan_core_device_tiles_xy(spec: CapArraySpecModel) -> tuple[int, int, set[GridXY]]:
+def _plan_core_device_tiles_xy(spec: CapArraySpecModel) -> tuple[int, int, GroupByXY]:
     algorithm = spec.placement.algorithm
 
     if algorithm == "user":
         return _plan_user_pattern_xy(spec.placement.pattern)
 
     rows = spec.placement.rows
-    device_count = sum(spec.topology.cap_list)
+    cap_list = spec.topology.cap_list
+    device_count = sum(cap_list)
     cols = max(1, math.ceil(device_count / rows))
 
     positions = _enumerate_positions(cols=cols, rows=rows, algorithm=algorithm)
-    device_xy = set(positions[:device_count])
-    return cols, rows, device_xy
+    placed_positions = positions[:device_count]
+
+    group_index_by_xy: GroupByXY = {}
+    cursor = 0
+    for group_index, count in enumerate(cap_list):
+        for _ in range(count):
+            group_index_by_xy[placed_positions[cursor]] = group_index
+            cursor += 1
+    return cols, rows, group_index_by_xy
 
 
-def _plan_user_pattern_xy(pattern: list[list[str]] | None) -> tuple[int, int, set[GridXY]]:
+def _plan_user_pattern_xy(pattern: list[list[str]] | None) -> tuple[int, int, GroupByXY]:
     if pattern is None or len(pattern) == 0:
         raise ValueError("placement.pattern must be non-empty when algorithm is 'user'")
 
@@ -110,12 +126,29 @@ def _plan_user_pattern_xy(pattern: list[list[str]] | None) -> tuple[int, int, se
     if cols < 1:
         raise ValueError("placement.pattern rows must not be empty")
 
-    device_xy: set[GridXY] = set()
+    group_index_by_xy: GroupByXY = {}
     for y, row in enumerate(pattern):
-        for x, _device_name in enumerate(row):
-            device_xy.add((x, y))
+        for x, device_name in enumerate(row):
+            group_index_by_xy[(x, y)] = _group_index_from_cap_device_name(device_name)
 
-    return cols, rows, device_xy
+    return cols, rows, group_index_by_xy
+
+
+def _group_index_from_cap_device_name(device_name: str) -> int | None:
+    if "_" not in device_name:
+        raise ValueError(f"invalid cap device name in pattern: {device_name!r}")
+    prefix, _suffix = device_name.split("_", maxsplit=1)
+    if len(prefix) < 2 or not prefix.startswith("C"):
+        raise ValueError(f"invalid cap device name in pattern: {device_name!r}")
+
+    numeric_part = prefix[1:]
+    if not numeric_part.isdigit():
+        raise ValueError(f"invalid cap device name in pattern: {device_name!r}")
+
+    cap_group = int(numeric_part)
+    if cap_group == 0:
+        return None
+    return cap_group - 1
 
 
 def _enumerate_positions(*, cols: int, rows: int, algorithm: str) -> list[GridXY]:
@@ -157,24 +190,24 @@ def _plan_boundary_device_tiles_xy(
     right_thickness: int,
     top_thickness: int,
     bottom_thickness: int,
-) -> set[GridXY]:
-    device_xy: set[GridXY] = set()
+) -> GroupByXY:
+    group_by_xy: GroupByXY = {}
 
     if left_thickness:
         for x in range(left_thickness):
             for y in range(cells_y):
-                device_xy.add((x, y))
+                group_by_xy[(x, y)] = None
     if right_thickness:
         for x in range(cells_x - right_thickness, cells_x):
             for y in range(cells_y):
-                device_xy.add((x, y))
+                group_by_xy[(x, y)] = None
     if top_thickness:
         for y in range(top_thickness):
             for x in range(cells_x):
-                device_xy.add((x, y))
+                group_by_xy[(x, y)] = None
     if bottom_thickness:
         for y in range(cells_y - bottom_thickness, cells_y):
             for x in range(cells_x):
-                device_xy.add((x, y))
+                group_by_xy[(x, y)] = None
 
-    return device_xy
+    return group_by_xy

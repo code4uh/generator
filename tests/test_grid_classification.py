@@ -40,3 +40,26 @@ def test_generated_grid_classification_rejects_invalid_kind() -> None:
 
     with pytest.raises(ValueError, match="invalid tile kinds"):
         GeneratedGridClassification(cells_x=1, cells_y=1, layers=1, tiles=tiles)
+
+
+def test_generated_grid_classification_accepts_optional_group_index_by_xy() -> None:
+    classification = GeneratedGridClassification(
+        cells_x=1,
+        cells_y=1,
+        layers=2,
+        tiles={(0, 0, 0): "device", (0, 0, 1): "device"},
+        group_index_by_xy={(0, 0): 0},
+    )
+
+    assert classification.group_index_by_xy == {(0, 0): 0}
+
+
+def test_generated_grid_classification_rejects_out_of_grid_group_coordinate() -> None:
+    with pytest.raises(ValueError, match="group_index_by_xy contains"):
+        GeneratedGridClassification(
+            cells_x=1,
+            cells_y=1,
+            layers=1,
+            tiles={(0, 0, 0): "device"},
+            group_index_by_xy={(1, 0): 0},
+        )

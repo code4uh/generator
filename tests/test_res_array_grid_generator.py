@@ -161,3 +161,28 @@ def test_res_grid_generator_has_complete_grid_coverage_without_undefined_tiles()
     assert len(classification.tiles) == (
         classification.cells_x * classification.cells_y * classification.layers
     )
+
+
+def test_res_grid_generator_assigns_group_index_by_xy() -> None:
+    spec = load_fixture("spec/fixtures/valid/res_array_minimal.json")
+    spec["inputs"]["topology"]["res_list"] = [1, 2]
+    spec["inputs"]["topology"]["parallelResNo"] = 1
+
+    classification = ResArrayGridGenerator().generate(to_res_model(spec), layers=1)
+
+    assert classification.group_index_by_xy == {(0, 0): 0, (1, 0): 1, (2, 0): 1}
+
+
+def test_res_grid_generator_boundary_tiles_have_none_group_index() -> None:
+    spec = load_fixture("spec/fixtures/valid/res_array_minimal.json")
+    spec["inputs"]["topology"]["res_list"] = [1]
+    spec["inputs"]["topology"]["parallelResNo"] = 1
+    spec["inputs"]["topology"]["boundary_resistors"].update(
+        {"left": True, "right": False, "top": True, "bottom": False, "boundary_device_size": "unit"}
+    )
+
+    classification = ResArrayGridGenerator().generate(to_res_model(spec), layers=1)
+
+    assert classification.group_index_by_xy[(0, 0)] is None
+    assert classification.group_index_by_xy[(0, 1)] is None
+    assert classification.group_index_by_xy[(1, 0)] is None
