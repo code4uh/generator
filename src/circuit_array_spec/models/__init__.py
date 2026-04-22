@@ -1,3 +1,10 @@
+from .grid_classification import (
+    GeneratedGridClassification,
+    GridCoordinate,
+    TileKind,
+    create_uniform_classification,
+    iter_grid_coordinates,
+)
 from .lightweight import (
     CapArraySpecModel,
     CapPlacement,
@@ -16,4 +23,9 @@ __all__ = [
     "ResTopology",
     "ResPlacement",
     "Output",
+    "TileKind",
+    "GridCoordinate",
+    "GeneratedGridClassification",
+    "iter_grid_coordinates",
+    "create_uniform_classification",
 ]
