@@ -53,6 +53,15 @@ def test_res_boundary_size_legacy_field_is_rejected() -> None:
         validate_spec(spec)
 
 
+@pytest.mark.parametrize("invalid_value", ["MINIMUM", "foo", "1"])
+def test_boundary_device_size_invalid_values_are_rejected(invalid_value: str) -> None:
+    spec = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
+    spec["inputs"]["topology"]["boundary_caps"]["boundary_device_size"] = invalid_value
+
+    with pytest.raises(SpecValidationError, match="BoundaryDeviceSize|must be one of"):
+        validate_spec(spec)
+
+
 def test_oneof_error_includes_sub_causes() -> None:
     pytest.importorskip("jsonschema")
     spec = {

@@ -1,3 +1,4 @@
+from .enums import BoundaryDeviceSize
 from .grid_classification import (
     GeneratedGridClassification,
     GridCoordinate,
@@ -21,6 +22,7 @@ from .lightweight import (
 )
 
 __all__ = [
+    "BoundaryDeviceSize",
     "CapArraySpecModel",
     "ResArraySpecModel",
     "CapTopology",

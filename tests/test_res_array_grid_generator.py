@@ -58,7 +58,7 @@ def test_res_grid_generator_boundary_resistors_expand_device_area() -> None:
     spec["inputs"]["topology"]["res_list"] = [2]
     spec["inputs"]["topology"]["parallelResNo"] = 1
     spec["inputs"]["topology"]["boundary_resistors"].update(
-        {"left": True, "right": False, "top": True, "bottom": True, "boundary_device_size": "Minimum"}
+        {"left": True, "right": False, "top": True, "bottom": True, "boundary_device_size": "minimum"}
     )
 
     classification = ResArrayGridGenerator().generate(to_res_model(spec), layers=1)
@@ -74,14 +74,14 @@ def test_res_grid_generator_boundary_device_size_is_metadata_only_in_v1_geometry
     spec_minimum["inputs"]["topology"]["res_list"] = [2]
     spec_minimum["inputs"]["topology"]["parallelResNo"] = 1
     spec_minimum["inputs"]["topology"]["boundary_resistors"].update(
-        {"left": True, "right": False, "top": True, "bottom": False, "boundary_device_size": "Minimum"}
+        {"left": True, "right": False, "top": True, "bottom": False, "boundary_device_size": "minimum"}
     )
 
     spec_unit = load_fixture("spec/fixtures/valid/res_array_minimal.json")
     spec_unit["inputs"]["topology"]["res_list"] = [2]
     spec_unit["inputs"]["topology"]["parallelResNo"] = 1
     spec_unit["inputs"]["topology"]["boundary_resistors"].update(
-        {"left": True, "right": False, "top": True, "bottom": False, "boundary_device_size": "Unit"}
+        {"left": True, "right": False, "top": True, "bottom": False, "boundary_device_size": "unit"}
     )
 
     minimum = ResArrayGridGenerator().generate(to_res_model(spec_minimum))
@@ -97,14 +97,14 @@ def test_res_grid_generator_boundary_side_flags_control_v1_footprint() -> None:
     spec_no_boundary["inputs"]["topology"]["res_list"] = [2]
     spec_no_boundary["inputs"]["topology"]["parallelResNo"] = 1
     spec_no_boundary["inputs"]["topology"]["boundary_resistors"].update(
-        {"left": False, "right": False, "top": False, "bottom": False, "boundary_device_size": "Unit"}
+        {"left": False, "right": False, "top": False, "bottom": False, "boundary_device_size": "unit"}
     )
 
     spec_left_top = load_fixture("spec/fixtures/valid/res_array_minimal.json")
     spec_left_top["inputs"]["topology"]["res_list"] = [2]
     spec_left_top["inputs"]["topology"]["parallelResNo"] = 1
     spec_left_top["inputs"]["topology"]["boundary_resistors"].update(
-        {"left": True, "right": False, "top": True, "bottom": False, "boundary_device_size": "Unit"}
+        {"left": True, "right": False, "top": True, "bottom": False, "boundary_device_size": "unit"}
     )
 
     no_boundary = ResArrayGridGenerator().generate(to_res_model(spec_no_boundary))
@@ -136,7 +136,7 @@ def test_res_grid_generator_rejects_unknown_boundary_device_size() -> None:
     spec = load_fixture("spec/fixtures/valid/res_array_minimal.json")
     spec["inputs"]["topology"]["boundary_resistors"]["boundary_device_size"] = "XL"
 
-    with pytest.raises(ValueError, match="unsupported boundary_device_size"):
+    with pytest.raises(ValueError, match="BoundaryDeviceSize"):
         ResArrayGridGenerator().generate(to_res_model(spec))
 
 
@@ -145,7 +145,7 @@ def test_res_grid_generator_has_complete_grid_coverage_without_undefined_tiles()
     spec["inputs"]["topology"]["res_list"] = [1, 2]
     spec["inputs"]["topology"]["parallelResNo"] = 2
     spec["inputs"]["topology"]["boundary_resistors"].update(
-        {"left": False, "right": False, "top": True, "bottom": False, "boundary_device_size": "Unit"}
+        {"left": False, "right": False, "top": True, "bottom": False, "boundary_device_size": "unit"}
     )
 
     classification = ResArrayGridGenerator().generate(to_res_model(spec), layers=3)

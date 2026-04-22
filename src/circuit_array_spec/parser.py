@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from copy import deepcopy
 
 from .models import (
+    BoundaryDeviceSize,
     CapArraySpecModel,
     CapPlacement,
     CapTopology,
@@ -50,6 +51,9 @@ def build_model(spec: Mapping[str, object]) -> CapArraySpecModel | ResArraySpecM
         topology = inputs["topology"]
         placement = inputs["placement"]
         output = raw["output"]
+        boundary_caps = deepcopy(topology["boundary_caps"])
+        boundary_caps["boundary_device_size"] = BoundaryDeviceSize(boundary_caps["boundary_device_size"])
+
         return CapArraySpecModel(
             version=str(raw["version"]),
             type="cap_array",
@@ -58,7 +62,7 @@ def build_model(spec: Mapping[str, object]) -> CapArraySpecModel | ResArraySpecM
                 connection=topology["connection"],
                 plus_connected=topology.get("plusConnected"),
                 connect_dummy_caps=topology["connectDummyCaps"],
-                boundary_caps=deepcopy(topology["boundary_caps"]),
+                boundary_caps=boundary_caps,
             ),
             placement=CapPlacement(
                 rows=int(placement["rows"]),
@@ -73,6 +77,9 @@ def build_model(spec: Mapping[str, object]) -> CapArraySpecModel | ResArraySpecM
     topology = inputs["topology"]
     placement = inputs["placement"]
     output = raw["output"]
+    boundary_resistors = deepcopy(topology["boundary_resistors"])
+    boundary_resistors["boundary_device_size"] = BoundaryDeviceSize(boundary_resistors["boundary_device_size"])
+
     return ResArraySpecModel(
         version=str(raw["version"]),
         type="res_array",
@@ -80,7 +87,7 @@ def build_model(spec: Mapping[str, object]) -> CapArraySpecModel | ResArraySpecM
             res_list=list(topology["res_list"]),
             parallel_res_no=int(topology["parallelResNo"]),
             connect_dummy_res=topology["connectDummyRes"],
-            boundary_resistors=deepcopy(topology["boundary_resistors"]),
+            boundary_resistors=boundary_resistors,
         ),
         placement=ResPlacement(
             algorithm=placement["algorithm"],

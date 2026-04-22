@@ -11,14 +11,14 @@ V1 layer rule:
 V1 notes:
 - `placement.algorithm` is currently expected to be `side-by-side` for res arrays.
 - `boundary_resistors.boundary_device_size` is validated/acknowledged as boundary-device
-  metadata (`Unit`, `Minimum`), but does not change V1 tile geometry.
+  metadata (`unit`, `minimum`), but does not change V1 tile geometry.
 - `connect_dummy_res` does not change tile kinds in V1; it is treated as a
   deliberate no-op for this first classification stage.
 """
 
 from __future__ import annotations
 
-from .models import ResArraySpecModel
+from .models import BoundaryDeviceSize, ResArraySpecModel
 from .models.grid_classification import GeneratedGridClassification, TileKind, iter_grid_coordinates
 
 GridXY = tuple[int, int]
@@ -88,8 +88,8 @@ def _plan_core_device_tiles_xy(spec: ResArraySpecModel) -> tuple[int, int, set[G
     return cols, rows, {(x, 0) for x in range(cols)}
 
 
-def _validate_boundary_device_size_semantic(boundary_device_size: object) -> None:
-    if boundary_device_size in ("Unit", "Minimum"):
+def _validate_boundary_device_size_semantic(boundary_device_size: BoundaryDeviceSize) -> None:
+    if boundary_device_size in (BoundaryDeviceSize.UNIT, BoundaryDeviceSize.MINIMUM):
         return
     raise ValueError(f"unsupported boundary_device_size for V1 classification: {boundary_device_size!r}")
 

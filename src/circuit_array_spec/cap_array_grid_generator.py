@@ -10,7 +10,7 @@ V1 layer rule:
 
 V1 notes:
 - `boundary_caps.boundary_device_size` is validated/acknowledged as boundary-device metadata
-  (`Unit`, `Minimum`), but does not change V1 tile geometry.
+  (`unit`, `minimum`), but does not change V1 tile geometry.
 - `connect_dummy_caps` does not change tile kinds in V1; it is validated/read and
   documented as a no-op for classification (electrical connectivity is out of scope).
 - `common_centroid` uses a simple center-first placement heuristic (not an analog-
@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import math
 
-from .models import CapArraySpecModel
+from .models import BoundaryDeviceSize, CapArraySpecModel
 from .models.grid_classification import GeneratedGridClassification, TileKind, iter_grid_coordinates
 
 GridXY = tuple[int, int]
@@ -80,8 +80,8 @@ def _plan_device_tiles_xy(spec: CapArraySpecModel) -> tuple[int, int, set[GridXY
     return cells_x, cells_y, shifted_core | boundary_device_xy
 
 
-def _validate_boundary_device_size_semantic(boundary_device_size: object) -> None:
-    if boundary_device_size in ("Unit", "Minimum"):
+def _validate_boundary_device_size_semantic(boundary_device_size: BoundaryDeviceSize) -> None:
+    if boundary_device_size in (BoundaryDeviceSize.UNIT, BoundaryDeviceSize.MINIMUM):
         return
     raise ValueError(f"unsupported boundary_device_size for V1 classification: {boundary_device_size!r}")
 
