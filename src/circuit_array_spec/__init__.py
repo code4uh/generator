@@ -5,6 +5,7 @@ from .netlist import generate_netlist
 from .grid_classification import GeneratedGridClassification, TileKind, create_uniform_classification, iter_grid_coordinates
 from .models import CapArraySpecModel, ResArraySpecModel
 from .parser import build_model, parse_circuit_array_spec, parse_circuit_array_spec_json
+from .cap_array_grid_generator import CapArrayGridGenerator
 from .validator import SpecValidationError, validate_spec
 
 __all__ = [
@@ -24,6 +25,7 @@ __all__ = [
     "GeneratedGridClassification",
     "iter_grid_coordinates",
     "create_uniform_classification",
+    "CapArrayGridGenerator",
 ]
 
 from .layout3d import LayoutPipeline, LayoutValidationError, LayoutValidator
