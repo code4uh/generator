@@ -200,4 +200,7 @@ def validate_spec(spec: dict[str, Any]):
     elif spec["type"] != "res_array":
         raise SpecValidationError(f"Unbekannter type: {spec['type']}")
 
-    return build_model(spec)
+    try:
+        return build_model(spec)
+    except ValueError as error:
+        raise SpecValidationError(str(error)) from error

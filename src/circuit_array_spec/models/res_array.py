@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Annotated, Literal
+from typing import Annotated, Literal, TypedDict
 
 from pydantic import Field, model_validator
 
 from .common import (
     Advanced,
-    BoundarySize,
     PydanticOutput,
     PositiveInt,
     RoutingLevel,
@@ -16,6 +15,8 @@ from .common import (
     UnsupportedOptionPolicy,
     VersionLiteral,
 )
+
+from .enums import BoundaryDeviceSize
 
 ResPlacementAlgorithm = Literal["side-by-side"]
 ResConnectDummy = Literal["open_floating", "VSS"]
@@ -38,7 +39,15 @@ class ResBoundaryResistors(StrictModel):
     right: bool
     top: bool
     bottom: bool
-    boundary_device_size: BoundarySize
+    boundary_device_size: BoundaryDeviceSize
+
+
+class BoundaryResistors(TypedDict):
+    left: bool
+    right: bool
+    top: bool
+    bottom: bool
+    boundary_device_size: BoundaryDeviceSize
 
 
 class PydanticResTopology(StrictModel):
@@ -105,7 +114,7 @@ class ResTopology:
     res_list: list[int]
     parallel_res_no: int
     connect_dummy_res: ResConnectDummy
-    boundary_resistors: dict[str, object]
+    boundary_resistors: BoundaryResistors
 
 
 @dataclass(frozen=True)

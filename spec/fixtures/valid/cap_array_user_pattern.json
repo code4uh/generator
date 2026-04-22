@@ -14,7 +14,7 @@
         "right": false,
         "top": false,
         "bottom": false,
-        "boundary_device_size": "Unit"
+        "boundary_device_size": "unit"
       }
     },
     "placement": {

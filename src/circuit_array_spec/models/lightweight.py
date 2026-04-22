@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, TypedDict
+
+from .enums import BoundaryDeviceSize
 
 CapConnection = Literal["open", "shortPlusPins", "userDefined"]
 CapConnectDummy = Literal[
@@ -17,6 +19,22 @@ ResPlacementAlgorithm = Literal["side-by-side"]
 ResConnectDummy = Literal["open_floating", "VSS"]
 
 
+class BoundaryCaps(TypedDict):
+    left: bool
+    right: bool
+    top: bool
+    bottom: bool
+    boundary_device_size: BoundaryDeviceSize
+
+
+class BoundaryResistors(TypedDict):
+    left: bool
+    right: bool
+    top: bool
+    bottom: bool
+    boundary_device_size: BoundaryDeviceSize
+
+
 @dataclass(frozen=True)
 class Output:
     libname: str
@@ -29,7 +47,7 @@ class CapTopology:
     connection: CapConnection
     plus_connected: str | None
     connect_dummy_caps: CapConnectDummy
-    boundary_caps: dict[str, object]
+    boundary_caps: BoundaryCaps
 
 
 @dataclass(frozen=True)
@@ -54,7 +72,7 @@ class ResTopology:
     res_list: list[int]
     parallel_res_no: int
     connect_dummy_res: ResConnectDummy
-    boundary_resistors: dict[str, object]
+    boundary_resistors: BoundaryResistors
 
 
 @dataclass(frozen=True)

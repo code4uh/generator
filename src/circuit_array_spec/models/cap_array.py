@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Annotated, Literal
+from typing import Annotated, Literal, TypedDict
 
 from pydantic import Field, model_validator
 
 from .common import (
     Advanced,
-    BoundarySize,
     PydanticOutput,
     PositiveInt,
     RoutingLevel,
@@ -16,6 +15,8 @@ from .common import (
     UnsupportedOptionPolicy,
     VersionLiteral,
 )
+
+from .enums import BoundaryDeviceSize
 
 CapPlacementAlgorithm = Literal[
     "common_centroid",
@@ -43,7 +44,15 @@ class CapBoundaryCaps(StrictModel):
     right: bool
     top: bool
     bottom: bool
-    boundary_device_size: BoundarySize
+    boundary_device_size: BoundaryDeviceSize
+
+
+class BoundaryCaps(TypedDict):
+    left: bool
+    right: bool
+    top: bool
+    bottom: bool
+    boundary_device_size: BoundaryDeviceSize
 
 
 class PydanticCapTopology(StrictModel):
@@ -127,7 +136,7 @@ class CapTopology:
     connection: CapConnection
     plus_connected: str | None
     connect_dummy_caps: CapConnectDummy
-    boundary_caps: dict[str, object]
+    boundary_caps: BoundaryCaps
 
 
 @dataclass(frozen=True)

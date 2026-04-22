@@ -14,7 +14,6 @@ PositiveFloat = Annotated[float, Field(gt=0)]
 VersionLiteral = Literal["0.1"]
 UnsupportedOptionPolicy = Literal["ignore", "ignore_with_warning", "error"]
 RoutingLevel = Literal["full", "partial", "none"]
-BoundarySize = Literal["Unit", "Minimum"]
 
 
 class StrictModel(BaseModel):
