@@ -3,7 +3,7 @@ PYTHON := python
 
 # Modules
 DEBUG_MODULE := circuit_array_spec.debug_cli
-RENDER_MODULE := layout3d.render_demo
+RENDER_MODULE := circuit_array_spec.render_cli
 
 # Paths
 SRC := src
