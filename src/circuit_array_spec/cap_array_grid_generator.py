@@ -42,6 +42,12 @@ class CapArrayGridGenerator:
 
         return GeneratedGridClassification(cells_x=cells_x, cells_y=cells_y, layers=layers, tiles=tiles)
 
+    def generate_tile_classification(
+        self, spec: CapArraySpecModel, *, layers: int = 1
+    ) -> GeneratedGridClassification:
+        """Explicit alias for first-stage output generation."""
+        return self.generate(spec, layers=layers)
+
 
 def _plan_device_tiles_xy(spec: CapArraySpecModel) -> tuple[int, int, set[GridXY]]:
     core_cols, core_rows, core_device_xy = _plan_core_device_tiles_xy(spec)
