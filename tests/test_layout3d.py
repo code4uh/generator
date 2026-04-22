@@ -220,13 +220,13 @@ def test_pipeline_raises_structured_error() -> None:
 
 
 def test_legacy_namespace_remains_compatible() -> None:
-    from circuit_array_spec.layout3d import LayoutPipeline as LegacyLayoutPipeline
+    from layout3d import LayoutPipeline as LegacyLayoutPipeline
 
     assert LegacyLayoutPipeline is LayoutPipeline
 
 
 def test_legacy_and_canonical_exports_are_consistent() -> None:
-    import circuit_array_spec.layout3d as legacy
+    import layout3d as legacy
     import layout3d as canonical
 
     expected_symbols = {
@@ -248,9 +248,9 @@ def test_legacy_and_canonical_exports_are_consistent() -> None:
 
 
 def test_legacy_submodule_objects_are_consistent() -> None:
-    from circuit_array_spec.layout3d.validation import LayoutValidator as LegacyValidator
+    from layout3d.validation import LayoutValidator as LegacyValidator
     from layout3d.validation import LayoutValidator as CanonicalValidator
-    from circuit_array_spec.layout3d.errors import LayoutValidationError as LegacyError
+    from layout3d.errors import LayoutValidationError as LegacyError
     from layout3d.errors import LayoutValidationError as CanonicalError
 
     assert LegacyValidator is CanonicalValidator
