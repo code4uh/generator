@@ -52,6 +52,22 @@ def test_cap_grid_generator_side_by_side_vs_row_wise_differ() -> None:
     assert row_wise.tile_kind_at(1, 1, 0) == "wire"
 
 
+def test_cap_grid_generator_simple_side_by_side_case() -> None:
+    spec = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
+    spec["inputs"]["topology"]["cap_list"] = [3]
+    spec["inputs"]["placement"]["rows"] = 2
+    spec["inputs"]["placement"]["algorithm"] = "side-by-side"
+
+    classification = CapArrayGridGenerator().generate_tile_classification(to_cap_model(spec), layers=1)
+
+    assert classification.cells_x == 2
+    assert classification.cells_y == 2
+    assert classification.tile_kind_at(0, 0, 0) == "device"
+    assert classification.tile_kind_at(1, 0, 0) == "device"
+    assert classification.tile_kind_at(0, 1, 0) == "device"
+    assert classification.tile_kind_at(1, 1, 0) == "wire"
+
+
 def test_cap_grid_generator_common_centroid_differs_from_side_by_side() -> None:
     base = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
     base["inputs"]["topology"]["cap_list"] = [3]
