@@ -69,6 +69,54 @@ def test_res_grid_generator_boundary_resistors_expand_device_area() -> None:
     assert classification.tile_kind_at(1, 1, 0) == "device"
 
 
+def test_res_grid_generator_boundary_size_is_metadata_only_in_v1_geometry() -> None:
+    spec_minimum = load_fixture("spec/fixtures/valid/res_array_minimal.json")
+    spec_minimum["inputs"]["topology"]["res_list"] = [2]
+    spec_minimum["inputs"]["topology"]["parallelResNo"] = 1
+    spec_minimum["inputs"]["topology"]["boundary_resistors"].update(
+        {"left": True, "right": False, "top": True, "bottom": False, "boundary_size": "Minimum"}
+    )
+
+    spec_unit = load_fixture("spec/fixtures/valid/res_array_minimal.json")
+    spec_unit["inputs"]["topology"]["res_list"] = [2]
+    spec_unit["inputs"]["topology"]["parallelResNo"] = 1
+    spec_unit["inputs"]["topology"]["boundary_resistors"].update(
+        {"left": True, "right": False, "top": True, "bottom": False, "boundary_size": "Unit"}
+    )
+
+    minimum = ResArrayGridGenerator().generate(to_res_model(spec_minimum))
+    unit = ResArrayGridGenerator().generate(to_res_model(spec_unit))
+
+    assert minimum.cells_x == unit.cells_x == 3
+    assert minimum.cells_y == unit.cells_y == 2
+    assert minimum.tiles == unit.tiles
+
+
+def test_res_grid_generator_boundary_side_flags_control_v1_footprint() -> None:
+    spec_no_boundary = load_fixture("spec/fixtures/valid/res_array_minimal.json")
+    spec_no_boundary["inputs"]["topology"]["res_list"] = [2]
+    spec_no_boundary["inputs"]["topology"]["parallelResNo"] = 1
+    spec_no_boundary["inputs"]["topology"]["boundary_resistors"].update(
+        {"left": False, "right": False, "top": False, "bottom": False, "boundary_size": "Unit"}
+    )
+
+    spec_left_top = load_fixture("spec/fixtures/valid/res_array_minimal.json")
+    spec_left_top["inputs"]["topology"]["res_list"] = [2]
+    spec_left_top["inputs"]["topology"]["parallelResNo"] = 1
+    spec_left_top["inputs"]["topology"]["boundary_resistors"].update(
+        {"left": True, "right": False, "top": True, "bottom": False, "boundary_size": "Unit"}
+    )
+
+    no_boundary = ResArrayGridGenerator().generate(to_res_model(spec_no_boundary))
+    left_top = ResArrayGridGenerator().generate(to_res_model(spec_left_top))
+
+    assert no_boundary.cells_x == 2
+    assert no_boundary.cells_y == 1
+    assert left_top.cells_x == 3
+    assert left_top.cells_y == 2
+    assert no_boundary.tiles != left_top.tiles
+
+
 def test_res_grid_generator_connect_dummy_res_is_v1_noop_for_tile_kind() -> None:
     spec_open = load_fixture("spec/fixtures/valid/res_array_minimal.json")
     spec_open["inputs"]["topology"]["res_list"] = [2]
