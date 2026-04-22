@@ -7,7 +7,11 @@ from .models import CapArraySpecModel, ResArraySpecModel
 from .parser import build_model, parse_circuit_array_spec, parse_circuit_array_spec_json
 from .cap_array_grid_generator import CapArrayGridGenerator
 from .res_array_grid_generator import ResArrayGridGenerator
-from .generators import generate_grid_classification
+from .generators import (
+    classification_to_layout_skeleton,
+    generate_grid_classification,
+    generate_layout_skeleton,
+)
 from .validator import SpecValidationError, validate_spec
 
 __all__ = [
@@ -30,6 +34,8 @@ __all__ = [
     "CapArrayGridGenerator",
     "ResArrayGridGenerator",
     "generate_grid_classification",
+    "classification_to_layout_skeleton",
+    "generate_layout_skeleton",
 ]
 
 from .layout3d import LayoutPipeline, LayoutValidationError, LayoutValidator

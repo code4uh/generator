@@ -1,4 +1,4 @@
-"""Shared API for first-stage grid classification generation.
+"""Shared API for generation stages.
 
 `generate_grid_classification(...)` is the V1 entry point that dispatches by spec
 model type and returns only device-vs-wire tile classification.
@@ -9,7 +9,9 @@ from __future__ import annotations
 from ..cap_array_grid_generator import CapArrayGridGenerator
 from ..models import CapArraySpecModel, ResArraySpecModel
 from ..models.grid_classification import GeneratedGridClassification
+from ..models.layout_skeleton import GeneratedLayoutSkeleton
 from ..res_array_grid_generator import ResArrayGridGenerator
+from .layout_skeleton import classification_to_layout_skeleton
 
 
 def generate_grid_classification(
@@ -28,3 +30,13 @@ def generate_grid_classification(
         "Unsupported spec model type for generate_grid_classification: "
         f"{type(spec).__name__}"
     )
+
+
+def generate_layout_skeleton(
+    spec: CapArraySpecModel | ResArraySpecModel,
+    *,
+    layers: int = 1,
+) -> GeneratedLayoutSkeleton:
+    """Generate intermediate layout skeleton from V1 grid classification."""
+    classification = generate_grid_classification(spec, layers=layers)
+    return classification_to_layout_skeleton(classification)
