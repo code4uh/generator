@@ -9,11 +9,11 @@ TileKind = Literal["device", "wire"]
 GridCoordinate = tuple[int, int, int]
 
 
-def iter_grid_coordinates(width: int, height: int, layers: int) -> Iterable[GridCoordinate]:
+def iter_grid_coordinates(cells_x: int, cells_y: int, layers: int) -> Iterable[GridCoordinate]:
     """Yield all valid discrete coordinates for a grid shape."""
     for layer in range(layers):
-        for y in range(height):
-            for x in range(width):
+        for y in range(cells_y):
+            for x in range(cells_x):
                 yield (x, y, layer)
 
 
@@ -21,16 +21,16 @@ def iter_grid_coordinates(width: int, height: int, layers: int) -> Iterable[Grid
 class GeneratedGridClassification:
     """Complete tile-kind mapping for every valid grid coordinate."""
 
-    width: int
-    height: int
+    cells_x: int
+    cells_y: int
     layers: int
     tiles: dict[GridCoordinate, TileKind]
 
     def __post_init__(self) -> None:
-        if self.width < 1 or self.height < 1 or self.layers < 1:
+        if self.cells_x < 1 or self.cells_y < 1 or self.layers < 1:
             raise ValueError("grid dimensions must be >= 1")
 
-        expected = set(iter_grid_coordinates(self.width, self.height, self.layers))
+        expected = set(iter_grid_coordinates(self.cells_x, self.cells_y, self.layers))
         actual = set(self.tiles)
 
         out_of_grid = actual - expected
@@ -54,11 +54,11 @@ class GeneratedGridClassification:
 
 
 def create_uniform_classification(
-    width: int,
-    height: int,
+    cells_x: int,
+    cells_y: int,
     layers: int,
     kind: TileKind,
 ) -> GeneratedGridClassification:
     """Build a complete grid classification with one tile kind everywhere."""
-    tiles = {coord: kind for coord in iter_grid_coordinates(width, height, layers)}
-    return GeneratedGridClassification(width=width, height=height, layers=layers, tiles=tiles)
+    tiles = {coord: kind for coord in iter_grid_coordinates(cells_x, cells_y, layers)}
+    return GeneratedGridClassification(cells_x=cells_x, cells_y=cells_y, layers=layers, tiles=tiles)
