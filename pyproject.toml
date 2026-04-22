@@ -16,6 +16,10 @@ dependencies = [
     "Pillow>=10,<12",
 ]
 
+
+[project.scripts]
+circuit-array-debug = "circuit_array_spec.debug_cli:main"
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
