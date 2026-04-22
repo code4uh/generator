@@ -95,4 +95,4 @@ Dieses Modell enthält **bewusst kein Routing**:
 
 ## Namespace-Hinweis
 - Kanonischer Import: `layout3d`
-- `circuit_array_spec.layout3d` ist als rückwärtskompatibler Re-Export vorhanden.
+- Es gibt keinen separaten Legacy-Wrapper-Namespace mehr; nutze direkt `layout3d`.

@@ -43,6 +43,6 @@ __all__ = [
     "debug_layout",
 ]
 
-from .layout3d import LayoutPipeline, LayoutValidationError, LayoutValidator
+from layout3d import LayoutPipeline, LayoutValidationError, LayoutValidator
 
-__all__.extend(["LayoutPipeline", "LayoutValidationError", "LayoutValidator"] )
+__all__.extend(["LayoutPipeline", "LayoutValidationError", "LayoutValidator"])

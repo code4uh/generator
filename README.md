@@ -78,7 +78,7 @@ Für `cap_array` mit `connectDummyCaps = "open_floating"` werden keine Dummy-/Bo
 
 ## Developer Note: Rasterbasiertes 3D-Layout
 
-Kanonischer Namespace ist `layout3d` (die alten Pfade unter `circuit_array_spec.layout3d` bleiben als Kompatibilitäts-Wrapper erhalten).
+Kanonischer Namespace ist `layout3d` (frühere Legacy-Importpfade wurden entfernt).
 
 Module unter `layout3d` trennen strikt:
 
