@@ -13,6 +13,7 @@ from .generators import (
     generate_layout_skeleton,
 )
 from .validator import SpecValidationError, validate_spec
+from .debug import debug_grid_classification, debug_layout, debug_layout_skeleton, debug_spec
 
 __all__ = [
     "CapArraySpecModel",
@@ -36,6 +37,10 @@ __all__ = [
     "generate_grid_classification",
     "classification_to_layout_skeleton",
     "generate_layout_skeleton",
+    "debug_spec",
+    "debug_grid_classification",
+    "debug_layout_skeleton",
+    "debug_layout",
 ]
 
 from .layout3d import LayoutPipeline, LayoutValidationError, LayoutValidator
