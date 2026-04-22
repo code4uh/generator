@@ -20,7 +20,15 @@ def make_classification(
         coord: ("device" if coord in devices else "wire")
         for coord in iter_grid_coordinates(cells_x, cells_y, layers)
     }
-    return GeneratedGridClassification(cells_x=cells_x, cells_y=cells_y, layers=layers, tiles=tiles)
+    device_xy = {(x, y) for (x, y, _layer) in devices}
+    group_index_by_xy = {xy: 0 for xy in device_xy}
+    return GeneratedGridClassification(
+        cells_x=cells_x,
+        cells_y=cells_y,
+        layers=layers,
+        tiles=tiles,
+        group_index_by_xy=group_index_by_xy,
+    )
 
 
 def test_vertical_device_merging_contiguous_layers() -> None:

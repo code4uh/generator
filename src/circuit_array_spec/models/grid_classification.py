@@ -64,7 +64,6 @@ class GeneratedGridClassification:
 
         if self.group_index_by_xy is None:
             object.__setattr__(self, "group_index_by_xy", {})
-            return
 
         group_index_by_xy = self.group_index_by_xy
         xy_coords = {(x, y) for (x, y, _layer) in expected}
@@ -81,6 +80,17 @@ class GeneratedGridClassification:
         if invalid_group_values:
             invalid_repr = sorted(repr(value) for value in invalid_group_values)
             raise ValueError(f"invalid group index values: {invalid_repr}")
+
+        device_xy = {(x, y) for (x, y, _layer), kind in self.tiles.items() if kind == "device"}
+        wire_xy = xy_coords - device_xy
+
+        for x, y in sorted(device_xy):
+            if (x, y) not in group_index_by_xy:
+                raise ValueError(f"Missing group_index for device position ({x}, {y})")
+
+        for x, y in sorted(wire_xy):
+            if (x, y) in group_index_by_xy:
+                raise ValueError(f"Wire position ({x}, {y}) must not have group_index")
 
     def tile_kind_at(self, x: int, y: int, layer: int) -> TileKind:
         return self.tiles[(x, y, layer)]
