@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from layout3d.types import LayoutInstance
 
 from .models import CapArraySpecModel, ResArraySpecModel
+from .models.device_semantic import EnrichedGeneratedLayout
 from .models.grid_classification import GeneratedGridClassification
 from .models.layout_skeleton import GeneratedLayoutSkeleton
 
@@ -240,5 +241,36 @@ def debug_layout(layout: LayoutInstance) -> str:
 
     if ordered_wires_empty:
         lines.append("note: all wire_tiles have empty ordered_wires")
+
+    return "\n".join(lines)
+
+
+def debug_semantics(enriched_layout: EnrichedGeneratedLayout) -> str:
+    """Return deterministic summary of enriched device semantics."""
+    lines = [
+        "EnrichedGeneratedLayout",
+        f"devices={len(enriched_layout.layout.devices)}",
+        "",
+        "device_semantics",
+    ]
+
+    entries = sorted(
+        enriched_layout.device_semantics_by_id.items(),
+        key=lambda item: (item[0],),
+    )
+    if not entries:
+        lines.append("- (none)")
+        return "\n".join(lines)
+
+    for device_id, semantic in entries:
+        lines.append(
+            "- "
+            f"{device_id}: "
+            f"family={semantic.family} "
+            f"role={semantic.role} "
+            f"group_index={semantic.group_index} "
+            f"boundary_side={semantic.boundary_side} "
+            f"boundary_device_size={semantic.boundary_device_size}"
+        )
 
     return "\n".join(lines)
