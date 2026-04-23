@@ -1,5 +1,5 @@
-from circuit_array_spec.generators.layout import skeleton_to_layout
-from circuit_array_spec.models.layout_skeleton import (
+from arraylayout.layout.build import skeleton_to_layout
+from arraylayout.skeleton.models import (
     GeneratedDeviceStack,
     GeneratedLayoutSkeleton,
     GeneratedWireCell,

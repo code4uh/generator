@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from .derive import derive_cap_grid, derive_res_grid
+from ..derive import derive_cap_grid, derive_res_grid
 
 CAP_DEFAULT_VALUE = "1f"
 CAP_DEFAULT_WIDTH = "1u"

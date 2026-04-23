@@ -6,10 +6,10 @@ from collections.abc import Mapping
 
 from layout3d.types import LayoutInstance
 
-from .models import CapArraySpecModel, ResArraySpecModel
-from .models.device_semantic import EnrichedGeneratedLayout
-from .models.grid_classification import GeneratedGridClassification
-from .models.layout_skeleton import GeneratedLayoutSkeleton
+from ..spec.models import CapArraySpecModel, ResArraySpecModel
+from ..semantics.device import EnrichedGeneratedLayout
+from ..classification.grid import GeneratedGridClassification
+from ..skeleton.models import GeneratedLayoutSkeleton
 
 
 def _format_bool(value: bool) -> str:
