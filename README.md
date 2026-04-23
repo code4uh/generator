@@ -19,7 +19,7 @@ Die Validierung erfolgt in zwei Schritten:
 import json
 from pathlib import Path
 
-from circuit_array_spec.validator import validate_spec
+from arraylayout.validator import validate_spec
 
 spec = json.loads(Path("examples/json/cap_array_v0_1.json").read_text())
 model = validate_spec(spec)
@@ -29,7 +29,7 @@ print(type(model).__name__)
 ## Ableitungsfunktionen
 
 ```python
-from circuit_array_spec.derive import (
+from arraylayout.derive import (
     expand_cap_devices,
     derive_cap_grid,
     expand_res_devices,

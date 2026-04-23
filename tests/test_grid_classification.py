@@ -1,6 +1,6 @@
 import pytest
 
-from circuit_array_spec.models.grid_classification import (
+from arraylayout.models.grid_classification import (
     GeneratedGridClassification,
     create_uniform_classification,
     iter_grid_coordinates,

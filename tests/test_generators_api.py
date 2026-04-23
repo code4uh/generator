@@ -3,9 +3,9 @@ from pathlib import Path
 
 import pytest
 
-from circuit_array_spec.generators import generate_grid_classification
-from circuit_array_spec.models import CapArraySpecModel, ResArraySpecModel
-from circuit_array_spec.parser import build_model
+from arraylayout.generators import generate_grid_classification
+from arraylayout.models import CapArraySpecModel, ResArraySpecModel
+from arraylayout.parser import build_model
 
 ROOT = Path(__file__).resolve().parents[1]
 

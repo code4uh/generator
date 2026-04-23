@@ -18,8 +18,8 @@ dependencies = [
 
 
 [project.scripts]
-circuit-array-debug = "circuit_array_spec.debug_cli:main"
-circuit-array-render = "circuit_array_spec.render_cli:main"
+circuit-array-debug = "arraylayout.debug_cli:main"
+circuit-array-render = "arraylayout.render_cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
