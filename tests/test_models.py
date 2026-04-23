@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 
-from circuit_array_spec.models import BoundaryDeviceSize, CapArraySpecModel, ResArraySpecModel
-from circuit_array_spec.validator import validate_spec
+from arraylayout.models import BoundaryDeviceSize, CapArraySpecModel, ResArraySpecModel
+from arraylayout.validator import validate_spec
 
 ROOT = Path(__file__).resolve().parents[1]
 

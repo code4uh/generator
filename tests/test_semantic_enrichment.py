@@ -1,10 +1,10 @@
 import json
 from pathlib import Path
 
-from circuit_array_spec.debug import debug_semantics
-from circuit_array_spec.enrichers.semantic import enrich_layout_semantics
-from circuit_array_spec.models.grid_classification import GeneratedGridClassification
-from circuit_array_spec.parser import build_model
+from arraylayout.debug import debug_semantics
+from arraylayout.enrichers.semantic import enrich_layout_semantics
+from arraylayout.models.grid_classification import GeneratedGridClassification
+from arraylayout.parser import build_model
 from layout3d.types import Device, GridSize, LayoutInstance, PinGrid
 
 ROOT = Path(__file__).resolve().parents[1]
