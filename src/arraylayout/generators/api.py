@@ -6,15 +6,15 @@ model type and returns only device-vs-wire tile classification.
 
 from __future__ import annotations
 
-from ..cap_array_grid_generator import CapArrayGridGenerator
-from ..models import CapArraySpecModel, ResArraySpecModel
-from ..models.grid_classification import GeneratedGridClassification
+from ..classification.cap_array import CapArrayGridGenerator
+from ..spec.models import CapArraySpecModel, ResArraySpecModel
+from ..classification.grid import GeneratedGridClassification
 from layout3d.types import LayoutInstance
 
-from ..models.layout_skeleton import GeneratedLayoutSkeleton
-from ..res_array_grid_generator import ResArrayGridGenerator
-from .layout import skeleton_to_layout
-from .layout_skeleton import classification_to_layout_skeleton
+from ..skeleton.models import GeneratedLayoutSkeleton
+from ..classification.res_array import ResArrayGridGenerator
+from ..layout.build import skeleton_to_layout
+from ..skeleton.transform import classification_to_layout_skeleton
 
 
 def generate_grid_classification(

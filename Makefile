@@ -2,8 +2,8 @@
 PYTHON := python
 
 # Modules
-DEBUG_MODULE := circuit_array_spec.debug_cli
-RENDER_MODULE := circuit_array_spec.render_cli
+DEBUG_MODULE := arraylayout.debug.cli
+RENDER_MODULE := arraylayout.render.cli
 
 # Paths
 SRC := src

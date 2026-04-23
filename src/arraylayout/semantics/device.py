@@ -7,7 +7,7 @@ from typing import Literal
 
 from layout3d.types import LayoutInstance
 
-from .enums import BoundaryDeviceSize
+from ..spec.models.enums import BoundaryDeviceSize
 
 BoundarySide = Literal["left", "right", "top", "bottom"]
 DeviceFamily = Literal["cap", "res"]

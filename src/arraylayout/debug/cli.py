@@ -5,18 +5,16 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from .debug import (
+from .helpers import (
     debug_grid_classification,
     debug_layout,
     debug_layout_skeleton,
     debug_spec,
 )
-from .generators import (
-    classification_to_layout_skeleton,
-    generate_grid_classification,
-    skeleton_to_layout,
-)
-from .parser import build_model, parse_circuit_array_spec, parse_circuit_array_spec_json
+from ..generators import generate_grid_classification
+from ..layout import skeleton_to_layout
+from ..skeleton import classification_to_layout_skeleton
+from ..spec.parser import build_model, parse_circuit_array_spec, parse_circuit_array_spec_json
 
 
 Stage = str

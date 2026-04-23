@@ -1,18 +1,10 @@
-from .enums import BoundaryDeviceSize
-from .grid_classification import (
-    GeneratedGridClassification,
-    GridCoordinate,
-    TileKind,
-    create_uniform_classification,
-    iter_grid_coordinates,
-)
-from .layout_skeleton import (
-    GeneratedDeviceStack,
-    GeneratedLayoutSkeleton,
-    GeneratedWireCell,
-)
-from .device_semantic import EnrichedGeneratedLayout, GeneratedDeviceSemantic
-from .lightweight import (
+"""Public model/data types for arraylayout."""
+
+from ..classification.grid import GeneratedGridClassification, GridCoordinate, TileKind
+from ..semantics.device import EnrichedGeneratedLayout, GeneratedDeviceSemantic
+from ..skeleton.models import GeneratedDeviceStack, GeneratedLayoutSkeleton, GeneratedWireCell
+from ..spec.models import (
+    BoundaryDeviceSize,
     CapArraySpecModel,
     CapPlacement,
     CapTopology,
@@ -34,8 +26,6 @@ __all__ = [
     "TileKind",
     "GridCoordinate",
     "GeneratedGridClassification",
-    "iter_grid_coordinates",
-    "create_uniform_classification",
     "GeneratedDeviceStack",
     "GeneratedWireCell",
     "GeneratedLayoutSkeleton",

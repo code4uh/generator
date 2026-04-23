@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import math
 
-from ..models import CapArraySpecModel, ResArraySpecModel
-from ..models.device_semantic import (
+from ..spec.models import CapArraySpecModel, ResArraySpecModel
+from .device import (
     EnrichedGeneratedLayout,
     GeneratedDeviceSemantic,
 )
-from ..models.enums import BoundaryDeviceSize
-from ..models.grid_classification import GeneratedGridClassification
+from ..spec.models.enums import BoundaryDeviceSize
+from ..classification.grid import GeneratedGridClassification
 from layout3d.types import LayoutInstance
 
 
