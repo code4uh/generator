@@ -1,19 +1,19 @@
 """Circuit Array Specification helpers."""
 
-from .derive import derive_cap_grid, derive_res_grid, expand_cap_devices, expand_res_devices
-from .netlist import generate_netlist
-from .grid_classification import GeneratedGridClassification, TileKind, create_uniform_classification, iter_grid_coordinates
-from .models import CapArraySpecModel, ResArraySpecModel
-from .parser import build_model, parse_circuit_array_spec, parse_circuit_array_spec_json
-from .cap_array_grid_generator import CapArrayGridGenerator
-from .res_array_grid_generator import ResArrayGridGenerator
+from .spec.derive import derive_cap_grid, derive_res_grid, expand_cap_devices, expand_res_devices
+from .spec.netlist import generate_netlist
+from .classification import GeneratedGridClassification, TileKind, create_uniform_classification, iter_grid_coordinates
+from .spec.models import CapArraySpecModel, ResArraySpecModel
+from .spec.parser import build_model, parse_circuit_array_spec, parse_circuit_array_spec_json
+from .classification.cap_array import CapArrayGridGenerator
+from .classification.res_array import ResArrayGridGenerator
 from .generators import (
     classification_to_layout_skeleton,
     generate_grid_classification,
     generate_layout_skeleton,
 )
-from .validator import SpecValidationError, validate_spec
-from .debug import debug_grid_classification, debug_layout, debug_layout_skeleton, debug_spec
+from .spec.validator import SpecValidationError, validate_spec
+from .debug.helpers import debug_grid_classification, debug_layout, debug_layout_skeleton, debug_spec
 
 __all__ = [
     "CapArraySpecModel",

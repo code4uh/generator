@@ -1,8 +1,8 @@
 import pytest
 
-from circuit_array_spec.generators.layout_skeleton import classification_to_layout_skeleton
-from circuit_array_spec.models.grid_classification import GeneratedGridClassification, iter_grid_coordinates
-from circuit_array_spec.models.layout_skeleton import (
+from arraylayout.skeleton.transform import classification_to_layout_skeleton
+from arraylayout.classification.grid import GeneratedGridClassification, iter_grid_coordinates
+from arraylayout.skeleton.models import (
     GeneratedDeviceStack,
     GeneratedLayoutSkeleton,
     GeneratedWireCell,

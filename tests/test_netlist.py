@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from circuit_array_spec.netlist import generate_netlist
+from arraylayout.spec.netlist import generate_netlist
 
 ROOT = Path(__file__).resolve().parents[1]
 
