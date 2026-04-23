@@ -181,64 +181,7 @@ def test_cap_grid_generator_has_complete_grid_coverage_without_undefined_tiles()
     )
 
 
-def test_cap_grid_generator_side_by_side_assigns_group_index_by_xy() -> None:
-    spec = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
-    spec["inputs"]["topology"]["cap_list"] = [2, 1]
-    spec["inputs"]["placement"]["rows"] = 2
-    spec["inputs"]["placement"]["algorithm"] = "side-by-side"
-
-    classification = CapArrayGridGenerator().generate(to_cap_model(spec), layers=1)
-
-    assert classification.group_index_by_xy == {(0, 0): 0, (1, 0): 0, (0, 1): 1}
-
-
-def test_cap_grid_generator_row_wise_assigns_group_index_by_xy_across_rows() -> None:
-    spec = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
-    spec["inputs"]["topology"]["cap_list"] = [2, 1]
-    spec["inputs"]["placement"]["rows"] = 2
-    spec["inputs"]["placement"]["algorithm"] = "side-by-side-row-wise"
-
-    classification = CapArrayGridGenerator().generate(to_cap_model(spec), layers=1)
-
-    assert classification.group_index_by_xy == {(0, 0): 0, (0, 1): 0, (1, 0): 1}
-
-
-def test_cap_grid_generator_boundary_tiles_have_none_group_index() -> None:
-    spec = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
-    spec["inputs"]["topology"]["cap_list"] = [1]
-    spec["inputs"]["placement"]["rows"] = 1
-    spec["inputs"]["topology"]["boundary_caps"].update(
-        {"left": True, "right": False, "top": True, "bottom": False, "boundary_device_size": "unit"}
-    )
-
-    classification = CapArrayGridGenerator().generate(to_cap_model(spec), layers=2)
-
-    assert (0, 0) in classification.group_index_by_xy
-    assert (0, 1) in classification.group_index_by_xy
-    assert (1, 0) in classification.group_index_by_xy
-    assert classification.group_index_by_xy[(0, 0)] is None
-    assert classification.group_index_by_xy[(0, 1)] is None
-    assert classification.group_index_by_xy[(1, 0)] is None
-
-
-def test_cap_grid_generator_group_index_consistency_with_tile_kinds() -> None:
-    spec = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
-    spec["inputs"]["topology"]["cap_list"] = [3]
-    spec["inputs"]["placement"]["rows"] = 2
-    spec["inputs"]["placement"]["algorithm"] = "side-by-side"
-
-    classification = CapArrayGridGenerator().generate(to_cap_model(spec), layers=2)
-
-    for (x, y), _group in classification.group_index_by_xy.items():
-        assert classification.tile_kind_at(x, y, 0) == "device"
-        assert classification.tile_kind_at(x, y, 1) == "device"
-
-    for (x, y, _layer), kind in classification.tiles.items():
-        if kind == "wire":
-            assert (x, y) not in classification.group_index_by_xy
-
-
-def test_cap_grid_generator_group_index_mapping_is_deterministic() -> None:
+def test_cap_grid_generator_tile_classification_is_deterministic() -> None:
     spec = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
     spec["inputs"]["topology"]["cap_list"] = [2, 2]
     spec["inputs"]["placement"]["rows"] = 2
@@ -247,4 +190,4 @@ def test_cap_grid_generator_group_index_mapping_is_deterministic() -> None:
     first = CapArrayGridGenerator().generate(to_cap_model(spec), layers=1)
     second = CapArrayGridGenerator().generate(to_cap_model(spec), layers=1)
 
-    assert first.group_index_by_xy == second.group_index_by_xy
+    assert first.tiles == second.tiles
