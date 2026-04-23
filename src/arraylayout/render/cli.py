@@ -9,8 +9,8 @@ from layout3d.parser import layout_to_json
 from layout3d.render import render_layout_ascii, render_layout_png_layers, render_layout_png_stacked
 from layout3d.render_html import write_layer_gallery_html
 
-from .generators import generate_minimal_layout
-from .parser import build_model, parse_circuit_array_spec, parse_circuit_array_spec_json
+from ..generators import generate_minimal_layout
+from ..spec.parser import build_model, parse_circuit_array_spec, parse_circuit_array_spec_json
 
 
 def _build_parser() -> argparse.ArgumentParser:

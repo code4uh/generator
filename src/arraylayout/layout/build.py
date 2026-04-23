@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from layout3d.types import Device, DeviceSlot, GridSize, LayoutInstance, PinGrid, WireTile
 
-from ..models.layout_skeleton import GeneratedLayoutSkeleton
+from ..skeleton.models import GeneratedLayoutSkeleton
 
 _PLACEHOLDER_DEVICE_TYPE = "generated_device"
 _PLACEHOLDER_TEMPLATE_REF = "generated_layout_skeleton"

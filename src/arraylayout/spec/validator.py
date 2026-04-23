@@ -14,7 +14,7 @@ class SpecValidationError(ValueError):
     """Fehler bei Schema- oder semantischer Validierung."""
 
 
-_SCHEMA_PATH = Path(__file__).resolve().parents[2] / "spec" / "schema" / "circuit-array.schema.json"
+_SCHEMA_PATH = Path(__file__).resolve().parents[3] / "spec" / "schema" / "circuit-array.schema.json"
 _SCHEMA = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
 
 

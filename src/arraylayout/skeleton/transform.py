@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from ..models.grid_classification import GeneratedGridClassification
-from ..models.layout_skeleton import (
+from ..classification.grid import GeneratedGridClassification
+from .models import (
     GeneratedDeviceStack,
     GeneratedLayoutSkeleton,
     GeneratedWireCell,
