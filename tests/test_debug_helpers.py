@@ -31,7 +31,6 @@ def test_debug_grid_classification_contains_expected_markers() -> None:
             (1, 1, 1): "wire",
             (2, 1, 1): "device",
         },
-        group_index_by_xy={(0, 0): None, (0, 1): 0, (2, 1): 1},
     )
 
     output = debug_grid_classification(classification)
@@ -39,9 +38,6 @@ def test_debug_grid_classification_contains_expected_markers() -> None:
     assert "Layer 0" in output
     assert "Layer 1" in output
     assert "D W W" in output
-    assert "group_index_by_xy" in output
-    assert "B . ." in output
-    assert "0 . 1" in output
 
 
 def test_debug_layout_skeleton_includes_stacks_wires_and_tile_summary() -> None:

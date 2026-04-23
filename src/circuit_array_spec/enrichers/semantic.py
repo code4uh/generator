@@ -34,6 +34,27 @@ def _boundary_side_for_position(*, x: int, y: int, max_x: int, max_y: int) -> st
     return None
 
 
+def _is_boundary_device(
+    *,
+    spec: CapArraySpecModel | ResArraySpecModel,
+    x: int,
+    y: int,
+    max_x: int,
+    max_y: int,
+) -> bool:
+    if isinstance(spec, CapArraySpecModel):
+        boundary = spec.topology.boundary_caps
+    else:
+        boundary = spec.topology.boundary_resistors
+
+    return (
+        (bool(boundary["left"]) and x == 0)
+        or (bool(boundary["right"]) and x == max_x)
+        or (bool(boundary["top"]) and y == max_y)
+        or (bool(boundary["bottom"]) and y == 0)
+    )
+
+
 def enrich_layout_semantics(
     spec: CapArraySpecModel | ResArraySpecModel,
     classification: GeneratedGridClassification,
@@ -58,8 +79,19 @@ def enrich_layout_semantics(
 
     semantics_by_id: dict[str, GeneratedDeviceSemantic] = {}
     for device in ordered_devices:
-        group_index = classification.group_index_by_xy[(device.x, device.y)]
-        role = "boundary" if group_index is None else "core"
+        role = (
+            "boundary"
+            if _is_boundary_device(
+                spec=spec,
+                x=device.x,
+                y=device.y,
+                max_x=max_x,
+                max_y=max_y,
+            )
+            else "core"
+        )
+        # Group derivation from logical spec is deferred to a later stage.
+        group_index = None
 
         boundary_side = None
         boundary_size = None
