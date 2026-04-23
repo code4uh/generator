@@ -21,8 +21,8 @@ from __future__ import annotations
 
 import math
 
-from .models import BoundaryDeviceSize, CapArraySpecModel
-from .models.grid_classification import GeneratedGridClassification, TileKind, iter_grid_coordinates
+from ..spec.models import BoundaryDeviceSize, CapArraySpecModel
+from .grid import GeneratedGridClassification, TileKind, iter_grid_coordinates
 
 GridXY = tuple[int, int]
 
