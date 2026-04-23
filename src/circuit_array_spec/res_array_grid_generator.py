@@ -22,7 +22,6 @@ from .models import BoundaryDeviceSize, ResArraySpecModel
 from .models.grid_classification import GeneratedGridClassification, TileKind, iter_grid_coordinates
 
 GridXY = tuple[int, int]
-GroupByXY = dict[GridXY, int | None]
 
 
 class ResArrayGridGenerator:
@@ -32,8 +31,7 @@ class ResArrayGridGenerator:
         if layers < 1:
             raise ValueError("layers must be >= 1")
 
-        cells_x, cells_y, group_index_by_xy = _plan_device_tiles_xy(spec)
-        device_xy = set(group_index_by_xy)
+        cells_x, cells_y, device_xy = _plan_device_tiles_xy(spec)
 
         tiles: dict[tuple[int, int, int], TileKind] = {}
         for x, y, layer in iter_grid_coordinates(cells_x=cells_x, cells_y=cells_y, layers=layers):
@@ -44,7 +42,6 @@ class ResArrayGridGenerator:
             cells_y=cells_y,
             layers=layers,
             tiles=tiles,
-            group_index_by_xy=group_index_by_xy,
         )
 
     def generate_tile_classification(
@@ -54,8 +51,8 @@ class ResArrayGridGenerator:
         return self.generate(spec, layers=layers)
 
 
-def _plan_device_tiles_xy(spec: ResArraySpecModel) -> tuple[int, int, GroupByXY]:
-    core_cols, core_rows, core_group_by_xy = _plan_core_device_tiles_xy(spec)
+def _plan_device_tiles_xy(spec: ResArraySpecModel) -> tuple[int, int, set[GridXY]]:
+    core_cols, core_rows, core_device_xy = _plan_core_device_tiles_xy(spec)
 
     boundary = spec.topology.boundary_resistors
     _validate_boundary_device_size_semantic(boundary["boundary_device_size"])
@@ -70,8 +67,8 @@ def _plan_device_tiles_xy(spec: ResArraySpecModel) -> tuple[int, int, GroupByXY]
     cells_x = core_cols + left + right
     cells_y = core_rows + top + bottom
 
-    shifted_core: GroupByXY = {(x + left, y + top): group for (x, y), group in core_group_by_xy.items()}
-    boundary_group_by_xy = _plan_boundary_device_tiles_xy(
+    shifted_core = {(x + left, y + top) for (x, y) in core_device_xy}
+    boundary_device_xy = _plan_boundary_device_tiles_xy(
         cells_x=cells_x,
         cells_y=cells_y,
         left_thickness=left,
@@ -82,10 +79,10 @@ def _plan_device_tiles_xy(spec: ResArraySpecModel) -> tuple[int, int, GroupByXY]
 
     _ = spec.topology.connect_dummy_res
 
-    return cells_x, cells_y, shifted_core | boundary_group_by_xy
+    return cells_x, cells_y, shifted_core | boundary_device_xy
 
 
-def _plan_core_device_tiles_xy(spec: ResArraySpecModel) -> tuple[int, int, GroupByXY]:
+def _plan_core_device_tiles_xy(spec: ResArraySpecModel) -> tuple[int, int, set[GridXY]]:
     if spec.placement.algorithm != "side-by-side":
         raise ValueError(f"unsupported placement algorithm for res V1: {spec.placement.algorithm!r}")
 
@@ -93,14 +90,14 @@ def _plan_core_device_tiles_xy(spec: ResArraySpecModel) -> tuple[int, int, Group
     cols = max(1, resistor_instances)
     rows = 1
 
-    group_index_by_xy: GroupByXY = {}
+    device_xy: set[GridXY] = set()
     cursor = 0
-    for group_index, count in enumerate(spec.topology.res_list):
+    for _group_index, count in enumerate(spec.topology.res_list):
         for _series in range(count):
             for _parallel in range(spec.topology.parallel_res_no):
-                group_index_by_xy[(cursor, 0)] = group_index
+                device_xy.add((cursor, 0))
                 cursor += 1
-    return cols, rows, group_index_by_xy
+    return cols, rows, device_xy
 
 
 def _validate_boundary_device_size_semantic(boundary_device_size: BoundaryDeviceSize) -> None:
@@ -117,24 +114,24 @@ def _plan_boundary_device_tiles_xy(
     right_thickness: int,
     top_thickness: int,
     bottom_thickness: int,
-) -> GroupByXY:
-    group_by_xy: GroupByXY = {}
+) -> set[GridXY]:
+    device_xy: set[GridXY] = set()
 
     if left_thickness:
         for x in range(left_thickness):
             for y in range(cells_y):
-                group_by_xy[(x, y)] = None
+                device_xy.add((x, y))
     if right_thickness:
         for x in range(cells_x - right_thickness, cells_x):
             for y in range(cells_y):
-                group_by_xy[(x, y)] = None
+                device_xy.add((x, y))
     if top_thickness:
         for y in range(top_thickness):
             for x in range(cells_x):
-                group_by_xy[(x, y)] = None
+                device_xy.add((x, y))
     if bottom_thickness:
         for y in range(cells_y - bottom_thickness, cells_y):
             for x in range(cells_x):
-                group_by_xy[(x, y)] = None
+                device_xy.add((x, y))
 
-    return group_by_xy
+    return device_xy
