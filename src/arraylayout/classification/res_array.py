@@ -18,8 +18,8 @@ V1 notes:
 
 from __future__ import annotations
 
-from .models import BoundaryDeviceSize, ResArraySpecModel
-from .models.grid_classification import GeneratedGridClassification, TileKind, iter_grid_coordinates
+from ..spec.models import BoundaryDeviceSize, ResArraySpecModel
+from .grid import GeneratedGridClassification, TileKind, iter_grid_coordinates
 
 GridXY = tuple[int, int]
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from circuit_array_spec.debug_cli import main
+from arraylayout.debug.cli import main
 
 ROOT = Path(__file__).resolve().parents[1]
 

@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from circuit_array_spec.derive import derive_cap_grid, derive_res_grid, expand_cap_devices, expand_res_devices
+from arraylayout.spec.derive import derive_cap_grid, derive_res_grid, expand_cap_devices, expand_res_devices
 
 ROOT = Path(__file__).resolve().parents[1]
 

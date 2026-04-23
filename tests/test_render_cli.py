@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from circuit_array_spec.render_cli import main
+from arraylayout.render.cli import main
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -85,9 +85,9 @@ def test_render_cli_passes_render_options_and_writes_html(monkeypatch, tmp_path:
         out_html.parent.mkdir(parents=True, exist_ok=True)
         out_html.write_text("<html></html>", encoding="utf-8")
 
-    monkeypatch.setattr("circuit_array_spec.render_cli.render_layout_png_layers", _fake_render_layers)
-    monkeypatch.setattr("circuit_array_spec.render_cli.render_layout_png_stacked", _fake_render_stacked)
-    monkeypatch.setattr("circuit_array_spec.render_cli.write_layer_gallery_html", _fake_write_html)
+    monkeypatch.setattr("arraylayout.render.cli.render_layout_png_layers", _fake_render_layers)
+    monkeypatch.setattr("arraylayout.render.cli.render_layout_png_stacked", _fake_render_stacked)
+    monkeypatch.setattr("arraylayout.render.cli.write_layer_gallery_html", _fake_write_html)
 
     exit_code = main([
         _example("examples/json/cap_array_v0_1.json"),
