@@ -85,7 +85,7 @@ def debug_spec(spec: CapArraySpecModel | ResArraySpecModel | Mapping[str, object
 
 
 def debug_grid_classification(classification: GeneratedGridClassification) -> str:
-    """Return deterministic layer grids and XY group index map."""
+    """Return deterministic layer grids for stage-2 tile classification."""
     lines = [
         "GeneratedGridClassification",
         (
@@ -108,28 +108,6 @@ def debug_grid_classification(classification: GeneratedGridClassification) -> st
         lines.extend(layer_rows)
         if layer + 1 < classification.layers:
             lines.append("")
-
-    lines.extend(["", "group_index_by_xy"])
-
-    def _group_value(x: int, y: int) -> str:
-        group_index = classification.group_index_by_xy.get((x, y))
-        has_device = any(
-            classification.tile_kind_at(x, y, layer) == "device"
-            for layer in range(classification.layers)
-        )
-        if not has_device:
-            return "."
-        if group_index is None:
-            return "B"
-        return str(group_index)
-
-    lines.extend(
-        _grid_rows(
-            cells_x=classification.cells_x,
-            cells_y=classification.cells_y,
-            value_at=_group_value,
-        )
-    )
 
     return "\n".join(lines)
 

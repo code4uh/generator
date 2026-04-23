@@ -16,11 +16,15 @@ DeviceRole = Literal["core", "boundary"]
 
 @dataclass(frozen=True)
 class GeneratedDeviceSemantic:
-    """Minimal semantic information for a generated layout device."""
+    """Minimal semantic information for a generated layout device.
+
+    Every semantic device belongs to exactly one logical group. Group ``0`` is
+    reserved for boundary and dummy devices.
+    """
 
     family: DeviceFamily
     role: DeviceRole
-    group_index: int | None
+    group_index: int
     boundary_side: BoundarySide | None
     boundary_device_size: BoundaryDeviceSize | None
 
