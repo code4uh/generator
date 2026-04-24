@@ -3,23 +3,29 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "circuit-array-spec"
+name = "grid-layout-generator"
 version = "0.1.0"
-description = "Parser, validation and derivation helpers for the Circuit Array Specification"
+description = "Tooling for generating grid-based circuit layouts from structured specifications"
 readme = "README.md"
 requires-python = ">=3.10"
-authors = [{ name = "Generator" }]
+authors = [{ name = "code4uh" }]
 dependencies = [
     "pydantic>=2.6,<3",
     "jsonschema>=4.0",
-    "pytest-cov>=7.1.0",
     "Pillow>=10,<12",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov>=7.1.0",
+    "black",
+    "ruff",
+]
 
 [project.scripts]
-circuit-array-debug = "arraylayout.debug.cli:main"
-circuit-array-render = "arraylayout.render.cli:main"
+grid-layout-debug = "arraylayout.debug.cli:main"
+grid-layout-render = "arraylayout.render.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
