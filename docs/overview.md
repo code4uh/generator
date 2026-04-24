@@ -20,7 +20,7 @@ flowchart TD
 Und etwas detaillierter:
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph S1[Stage 1: Spec]
         S1A[CapArraySpecModel]
         S1B[ResArraySpecModel]
