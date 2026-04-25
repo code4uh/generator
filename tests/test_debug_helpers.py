@@ -1,10 +1,10 @@
-from arraylayout.debug import (
+from gridlayout.debug import (
     debug_grid_classification,
     debug_layout,
     debug_layout_skeleton,
 )
-from arraylayout.classification.grid import GeneratedGridClassification
-from arraylayout.skeleton.models import (
+from gridlayout.classification.grid import GeneratedGridClassification
+from gridlayout.skeleton.models import (
     GeneratedDeviceStack,
     GeneratedLayoutSkeleton,
     GeneratedWireCell,

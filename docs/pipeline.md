@@ -1,6 +1,6 @@
 # Array Layout Pipeline
 
-Diese Dokumentation beschreibt die Architektur der Pipeline im Paket `arraylayout` sowie die Rolle des separaten Pakets `layout3d`.
+Diese Dokumentation beschreibt die Architektur der Pipeline im Paket `gridlayout` sowie die Rolle des separaten Pakets `layout3d`.
 
 Die Pipeline transformiert eine fachliche Spezifikation (Spec) schrittweise in ein generisches 3D-Layout und ergänzt dieses anschließend um Semantik.
 
@@ -38,7 +38,7 @@ Beschreibung der fachlichen Struktur:
 
 ### Pfad
 
-`src/arraylayout/spec/`
+`src/gridlayout/spec/`
 
 ### Zentrale Dateien
 
@@ -85,7 +85,7 @@ Jede Rasterzelle `(x, y, layer)` wird als `DEVICE` oder `WIRE` klassifiziert.
 
 ### Pfad
 
-`src/arraylayout/classification/`
+`src/gridlayout/classification/`
 
 ### Zentrale Dateien
 
@@ -135,7 +135,7 @@ Umwandlung der Grid-Klassifikation in eine objektbasierte Struktur:
 
 ### Pfad
 
-`src/arraylayout/skeleton/`
+`src/gridlayout/skeleton/`
 
 ### Zentrale Dateien
 
@@ -181,7 +181,7 @@ Umwandlung der Grid-Klassifikation in eine objektbasierte Struktur:
 
 ### Pfad
 
-`src/arraylayout/layout/`
+`src/gridlayout/layout/`
 
 ### Zentrale Datei
 
@@ -228,7 +228,7 @@ Zuweisung fachlicher Bedeutung zu Devices.
 
 ### Pfad
 
-`src/arraylayout/semantics/`
+`src/gridlayout/semantics/`
 
 ### Zentrale Dateien
 
@@ -288,7 +288,7 @@ Explizite Modellierung logischer Gruppen:
 
 ### Pfad
 
-`src/arraylayout/semantics/groups.py`
+`src/gridlayout/semantics/groups.py`
 
 ### Geplante Klassen
 
@@ -311,7 +311,7 @@ Sichtbarmachung aller Pipeline-Stufen.
 
 ### Pfad
 
-`src/arraylayout/debug/`
+`src/gridlayout/debug/`
 
 ### Zentrale Dateien
 
@@ -339,7 +339,7 @@ Integration der Pipeline mit dem Rendering-System.
 
 ### Pfad
 
-`src/arraylayout/render/`
+`src/gridlayout/render/`
 
 ### Zentrale Datei
 
@@ -390,7 +390,7 @@ Generisches Layout- und Rendering-System.
 
 ### Pfad
 
-`src/arraylayout/__init__.py`
+`src/gridlayout/__init__.py`
 
 ### Ziel
 
@@ -436,15 +436,15 @@ ohne frühere Stufen zu verändern.
 
 ```mermaid
 flowchart TD
-    A[Spec Model<br/>arraylayout/spec] --> B[Grid Classification<br/>arraylayout/classification]
-    B --> C[Layout Skeleton<br/>arraylayout/skeleton]
-    C --> D[Minimal layout3d Layout<br/>arraylayout/layout]
-    D --> E[Semantic Enrichment<br/>arraylayout/semantics]
-    E --> F[Group Semantics / Matching<br/>arraylayout/semantics/groups.py]
+    A[Spec Model<br/>gridlayout/spec] --> B[Grid Classification<br/>gridlayout/classification]
+    B --> C[Layout Skeleton<br/>gridlayout/skeleton]
+    C --> D[Minimal layout3d Layout<br/>gridlayout/layout]
+    D --> E[Semantic Enrichment<br/>gridlayout/semantics]
+    E --> F[Group Semantics / Matching<br/>gridlayout/semantics/groups.py]
     F --> G[Connectivity / Pins / Routing<br/>future stages]
 
-    D --> R[Rendering<br/>arraylayout/render + layout3d/render]
-    A --> DBG[Debug CLI<br/>arraylayout/debug]
+    D --> R[Rendering<br/>gridlayout/render + layout3d/render]
+    A --> DBG[Debug CLI<br/>gridlayout/debug]
     B --> DBG
     C --> DBG
     D --> DBG

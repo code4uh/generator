@@ -2,15 +2,15 @@ Hier ist eine **Mermaid-Version** für README oder `docs/pipeline.md`:
 
 ```mermaid
 flowchart TD
-    A[Spec Model<br/>arraylayout/spec] --> B[Grid Classification<br/>arraylayout/classification]
-    B --> C[Layout Skeleton<br/>arraylayout/skeleton]
-    C --> D[Minimal layout3d Layout<br/>arraylayout/layout]
-    D --> E[Semantic Enrichment<br/>arraylayout/semantics]
-    E --> F[Group Semantics / Matching<br/>arraylayout/semantics/groups.py]
+    A[Spec Model<br/>gridlayout/spec] --> B[Grid Classification<br/>gridlayout/classification]
+    B --> C[Layout Skeleton<br/>gridlayout/skeleton]
+    C --> D[Minimal layout3d Layout<br/>gridlayout/layout]
+    D --> E[Semantic Enrichment<br/>gridlayout/semantics]
+    E --> F[Group Semantics / Matching<br/>gridlayout/semantics/groups.py]
     F --> G[Connectivity / Pins / Routing<br/>future stages]
 
-    D --> R[Rendering<br/>arraylayout/render + layout3d/render]
-    A --> DBG[Debug CLI<br/>arraylayout/debug]
+    D --> R[Rendering<br/>gridlayout/render + layout3d/render]
+    A --> DBG[Debug CLI<br/>gridlayout/debug]
     B --> DBG
     C --> DBG
     D --> DBG

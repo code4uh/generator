@@ -2,8 +2,8 @@
 PYTHON := python
 
 # Modules
-DEBUG_MODULE := arraylayout.debug.cli
-RENDER_MODULE := arraylayout.render.cli
+DEBUG_MODULE := gridlayout.debug.cli
+RENDER_MODULE := gridlayout.render.cli
 
 # Paths
 SRC := src
