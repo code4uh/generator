@@ -1,6 +1,6 @@
 import pytest
 
-from arraylayout.classification.grid import (
+from gridlayout.classification.grid import (
     GeneratedGridClassification,
     create_uniform_classification,
     iter_grid_coordinates,

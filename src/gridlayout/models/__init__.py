@@ -1,4 +1,4 @@
-"""Public model/data types for arraylayout."""
+"""Public model/data types for gridlayout."""
 
 from ..classification.grid import GeneratedGridClassification, GridCoordinate, TileKind
 from ..semantics.device import EnrichedGeneratedLayout, GeneratedDeviceSemantic

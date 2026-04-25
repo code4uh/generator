@@ -1,10 +1,12 @@
 import json
 from pathlib import Path
 
-from arraylayout.debug import debug_semantics
-from arraylayout.semantics.groups import enrich_layout_semantics
-from arraylayout.classification.grid import GeneratedGridClassification
-from arraylayout.spec.parser import build_model
+import pytest
+
+from gridlayout.debug import debug_semantics
+from gridlayout.semantics.groups import enrich_layout_semantics
+from gridlayout.classification.grid import GeneratedGridClassification
+from gridlayout.spec.parser import build_model
 from layout3d.types import Device, GridSize, LayoutInstance, PinGrid
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,13 +50,12 @@ def test_semantic_enrichment_core_devices_have_group_and_no_boundary_fields() ->
         layers=1,
         tiles={(0, 0, 0): "device", (1, 0, 0): "device"},
     )
-    layout = _layout_with_devices(_device("d0", 0, 0), _device("d1", 1, 0), cells_x=2, cells_y=1)
+    layout = _layout_with_devices(_device("d0", 0, 0), cells_x=2, cells_y=1)
 
     enriched = enrich_layout_semantics(spec, classification, layout)
 
     assert enriched.device_semantics_by_id["d0"].role == "core"
     assert enriched.device_semantics_by_id["d0"].group_index == 1
-    assert enriched.device_semantics_by_id["d1"].group_index == 1
     assert enriched.device_semantics_by_id["d0"].boundary_side is None
     assert enriched.device_semantics_by_id["d0"].boundary_device_size is None
 
@@ -82,8 +83,8 @@ def test_semantic_enrichment_boundary_devices_include_side_and_size() -> None:
     layout = _layout_with_devices(
         _device("left", 0, 1),
         _device("right", 2, 1),
-        _device("bottom", 1, 0),
-        _device("top", 1, 1),
+        _device("top", 1, 0),
+        _device("bottom", 1, 1),
         cells_x=3,
         cells_y=2,
     )
@@ -97,15 +98,19 @@ def test_semantic_enrichment_boundary_devices_include_side_and_size() -> None:
 
     assert enriched.device_semantics_by_id["right"].group_index == 0
     assert enriched.device_semantics_by_id["right"].boundary_side == "right"
-    assert enriched.device_semantics_by_id["bottom"].group_index == 0
-    assert enriched.device_semantics_by_id["bottom"].boundary_side == "bottom"
     assert enriched.device_semantics_by_id["top"].role == "boundary"
     assert enriched.device_semantics_by_id["top"].group_index == 0
     assert enriched.device_semantics_by_id["top"].boundary_side == "top"
+    assert enriched.device_semantics_by_id["bottom"].group_index == 0
+    assert enriched.device_semantics_by_id["bottom"].boundary_side == "bottom"
 
 
 def test_semantic_enrichment_mixed_layout_is_deterministic() -> None:
-    spec = build_model(load_fixture("spec/fixtures/valid/cap_array_minimal.json"))
+    spec_dict = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
+    spec_dict["inputs"]["topology"]["boundary_caps"].update(
+        {"left": True, "right": True, "top": True, "bottom": True}
+    )
+    spec = build_model(spec_dict)
 
     classification = GeneratedGridClassification(
         cells_x=2,
@@ -177,4 +182,37 @@ def test_semantic_enrichment_user_pattern_dummy_devices_are_group_zero() -> None
     enriched = enrich_layout_semantics(spec, classification, layout)
 
     assert enriched.device_semantics_by_id["core"].group_index == 1
+    assert enriched.device_semantics_by_id["core"].role == "core"
     assert enriched.device_semantics_by_id["dummy"].group_index == 0
+    assert enriched.device_semantics_by_id["dummy"].role == "dummy"
+
+
+def test_semantic_enrichment_raises_for_missing_core_group_mapping() -> None:
+    spec = build_model(load_fixture("spec/fixtures/valid/cap_array_minimal.json"))
+
+    classification = GeneratedGridClassification(
+        cells_x=2,
+        cells_y=1,
+        layers=1,
+        tiles={(0, 0, 0): "device", (1, 0, 0): "device"},
+    )
+    layout = _layout_with_devices(_device("core_out_of_map", 1, 0), cells_x=2, cells_y=1)
+
+    with pytest.raises(ValueError, match="missing core group mapping"):
+        enrich_layout_semantics(spec, classification, layout)
+
+
+def test_semantic_enrichment_rejects_ambiguous_non_boundary_group_zero(monkeypatch) -> None:
+    spec = build_model(load_fixture("spec/fixtures/valid/cap_array_minimal.json"))
+    classification = GeneratedGridClassification(
+        cells_x=1,
+        cells_y=1,
+        layers=1,
+        tiles={(0, 0, 0): "device"},
+    )
+    layout = _layout_with_devices(_device("core", 0, 0), cells_x=1, cells_y=1)
+
+    monkeypatch.setattr("gridlayout.semantics.groups._cap_core_group_map", lambda _spec: {(0, 0): 0})
+
+    with pytest.raises(ValueError, match="ambiguous non-boundary group_index=0"):
+        enrich_layout_semantics(spec, classification, layout)

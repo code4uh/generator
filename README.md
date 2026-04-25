@@ -65,7 +65,7 @@ Generates visual representations (ASCII / PNG / HTML).
 
 ```
 src/
-  arraylayout/
+  gridlayout/
     debug/
     render/
     ...
