@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+import arraylayout
 from arraylayout.generators import generate_grid_classification
 from arraylayout.models import CapArraySpecModel, ResArraySpecModel
 from arraylayout.spec.parser import build_model
@@ -42,3 +43,7 @@ def test_generate_grid_classification_dispatches_to_res_generator() -> None:
 def test_generate_grid_classification_rejects_unsupported_spec_type() -> None:
     with pytest.raises(TypeError, match="Unsupported spec model type"):
         generate_grid_classification(object())  # type: ignore[arg-type]
+
+
+def test_top_level_api_exports_generate_layout_skeleton() -> None:
+    assert "generate_layout_skeleton" in arraylayout.__all__
