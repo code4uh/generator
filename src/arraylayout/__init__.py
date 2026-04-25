@@ -1,6 +1,10 @@
 """Intentional top-level public API for arraylayout."""
 
-from .generators import generate_grid_classification, generate_minimal_layout
+from .generators import (
+    generate_grid_classification,
+    generate_layout_skeleton,
+    generate_minimal_layout,
+)
 from .semantics import enrich_layout_semantics
 from .skeleton import classification_to_layout_skeleton
 from .spec.models import BoundaryDeviceSize, CapArraySpecModel, ResArraySpecModel
@@ -15,6 +19,7 @@ __all__ = [
     "parse_circuit_array_spec_json",
     "validate_spec",
     "generate_grid_classification",
+    "generate_layout_skeleton",
     "classification_to_layout_skeleton",
     "generate_minimal_layout",
     "enrich_layout_semantics",

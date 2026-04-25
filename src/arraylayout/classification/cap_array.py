@@ -23,6 +23,7 @@ import math
 
 from ..spec.models import BoundaryDeviceSize, CapArraySpecModel
 from .grid import GeneratedGridClassification, TileKind, iter_grid_coordinates
+from .placement import enumerate_positions
 
 GridXY = tuple[int, int]
 
@@ -102,7 +103,7 @@ def _plan_core_device_tiles_xy(spec: CapArraySpecModel) -> tuple[int, int, set[G
     device_count = sum(cap_list)
     cols = max(1, math.ceil(device_count / rows))
 
-    positions = _enumerate_positions(cols=cols, rows=rows, algorithm=algorithm)
+    positions = enumerate_positions(cols=cols, rows=rows, algorithm=algorithm)
     placed_positions = positions[:device_count]
 
     device_xy: set[GridXY] = set()
@@ -144,37 +145,6 @@ def _validate_cap_device_name(device_name: str) -> None:
         raise ValueError(f"invalid cap device name in pattern: {device_name!r}")
 
     _ = int(numeric_part)
-
-
-def _enumerate_positions(*, cols: int, rows: int, algorithm: str) -> list[GridXY]:
-    if algorithm == "side-by-side":
-        return [(x, y) for y in range(rows) for x in range(cols)]
-
-    if algorithm == "side-by-side-row-wise":
-        return [(x, y) for x in range(cols) for y in range(rows)]
-
-    if algorithm == "common_centroid":
-        return _center_first_positions(cols=cols, rows=rows)
-
-    raise ValueError(f"unsupported placement algorithm: {algorithm!r}")
-
-
-def _center_first_positions(*, cols: int, rows: int) -> list[GridXY]:
-    center_x = (cols - 1) / 2.0
-    center_y = (rows - 1) / 2.0
-
-    positions = [(x, y) for y in range(rows) for x in range(cols)]
-    positions.sort(
-        key=lambda p: (
-            abs(p[0] - center_x) + abs(p[1] - center_y),
-            (p[0] + p[1]) % 2,
-            abs(p[1] - center_y),
-            abs(p[0] - center_x),
-            p[1],
-            p[0],
-        )
-    )
-    return positions
 
 
 def _plan_boundary_device_tiles_xy(
