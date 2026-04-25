@@ -118,6 +118,21 @@ def _core_group_index_for_device(
     return core_group_map[core_coord]
 
 
+def _non_boundary_role_for_group_index(
+    *,
+    spec: CapArraySpecModel | ResArraySpecModel,
+    group_index: int,
+) -> str:
+    if group_index == 0:
+        if isinstance(spec, CapArraySpecModel) and spec.placement.algorithm == "user":
+            return "dummy"
+        raise ValueError(
+            "ambiguous non-boundary group_index=0; dummy devices are only valid for cap_array "
+            "with placement.algorithm='user'"
+        )
+    return "core"
+
+
 def _res_core_group_map(spec: ResArraySpecModel) -> dict[tuple[int, int], int]:
     left_offset, top_offset = _core_offsets(spec)
     mapping: dict[tuple[int, int], int] = {}
@@ -174,7 +189,7 @@ def enrich_layout_semantics(
                 y=device.y,
                 core_group_map=core_group_map,
             )
-            role = "dummy" if group_index == 0 else "core"
+            role = _non_boundary_role_for_group_index(spec=spec, group_index=group_index)
 
         boundary_side = None
         boundary_size = None

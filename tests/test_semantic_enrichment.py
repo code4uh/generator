@@ -200,3 +200,19 @@ def test_semantic_enrichment_raises_for_missing_core_group_mapping() -> None:
 
     with pytest.raises(ValueError, match="missing core group mapping"):
         enrich_layout_semantics(spec, classification, layout)
+
+
+def test_semantic_enrichment_rejects_ambiguous_non_boundary_group_zero(monkeypatch) -> None:
+    spec = build_model(load_fixture("spec/fixtures/valid/cap_array_minimal.json"))
+    classification = GeneratedGridClassification(
+        cells_x=1,
+        cells_y=1,
+        layers=1,
+        tiles={(0, 0, 0): "device"},
+    )
+    layout = _layout_with_devices(_device("core", 0, 0), cells_x=1, cells_y=1)
+
+    monkeypatch.setattr("arraylayout.semantics.groups._cap_core_group_map", lambda _spec: {(0, 0): 0})
+
+    with pytest.raises(ValueError, match="ambiguous non-boundary group_index=0"):
+        enrich_layout_semantics(spec, classification, layout)
