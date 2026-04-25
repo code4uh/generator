@@ -24,8 +24,8 @@ dev = [
 ]
 
 [project.scripts]
-grid-layout-debug = "arraylayout.debug.cli:main"
-grid-layout-render = "arraylayout.render.cli:main"
+grid-layout-debug = "gridlayout.debug.cli:main"
+grid-layout-render = "gridlayout.render.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

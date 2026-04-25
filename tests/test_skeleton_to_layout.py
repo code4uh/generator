@@ -1,5 +1,5 @@
-from arraylayout.layout.build import skeleton_to_layout
-from arraylayout.skeleton.models import (
+from gridlayout.layout.build import skeleton_to_layout
+from gridlayout.skeleton.models import (
     GeneratedDeviceStack,
     GeneratedLayoutSkeleton,
     GeneratedWireCell,

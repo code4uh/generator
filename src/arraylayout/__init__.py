@@ -1,21 +1,30 @@
-"""Intentional top-level public API for arraylayout."""
+"""Backward-compatible shim for the renamed ``gridlayout`` package."""
 
-from .generators import generate_grid_classification, generate_minimal_layout
-from .semantics import enrich_layout_semantics
-from .skeleton import classification_to_layout_skeleton
-from .spec.models import BoundaryDeviceSize, CapArraySpecModel, ResArraySpecModel
-from .spec.parser import parse_circuit_array_spec, parse_circuit_array_spec_json
-from .spec.validator import validate_spec
+from __future__ import annotations
 
-__all__ = [
-    "CapArraySpecModel",
-    "ResArraySpecModel",
-    "BoundaryDeviceSize",
-    "parse_circuit_array_spec",
-    "parse_circuit_array_spec_json",
-    "validate_spec",
-    "generate_grid_classification",
-    "classification_to_layout_skeleton",
-    "generate_minimal_layout",
-    "enrich_layout_semantics",
-]
+import importlib
+import sys
+import warnings
+
+from gridlayout import *  # noqa: F401,F403
+from gridlayout import __all__ as __all__
+
+warnings.warn(
+    "'arraylayout' is deprecated and will be removed in a future release; use 'gridlayout' instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
+# Provide legacy subpackage import compatibility, e.g. ``import arraylayout.spec``.
+for _name in (
+    "classification",
+    "debug",
+    "generators",
+    "layout",
+    "models",
+    "render",
+    "semantics",
+    "skeleton",
+    "spec",
+):
+    sys.modules[f"arraylayout.{_name}"] = importlib.import_module(f"gridlayout.{_name}")

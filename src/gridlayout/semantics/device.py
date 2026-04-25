@@ -11,7 +11,7 @@ from ..spec.models.enums import BoundaryDeviceSize
 
 BoundarySide = Literal["left", "right", "top", "bottom"]
 DeviceFamily = Literal["cap", "res"]
-DeviceRole = Literal["core", "boundary"]
+DeviceRole = Literal["core", "boundary", "dummy"]
 
 
 @dataclass(frozen=True)

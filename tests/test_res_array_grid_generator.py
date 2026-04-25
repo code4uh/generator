@@ -3,10 +3,10 @@ from pathlib import Path
 
 import pytest
 
-from arraylayout.models import ResArraySpecModel
-from arraylayout.classification.grid import iter_grid_coordinates
-from arraylayout.spec.parser import build_model
-from arraylayout.classification.res_array import ResArrayGridGenerator
+from gridlayout.models import ResArraySpecModel
+from gridlayout.classification.grid import iter_grid_coordinates
+from gridlayout.spec.parser import build_model
+from gridlayout.classification.res_array import ResArrayGridGenerator
 
 ROOT = Path(__file__).resolve().parents[1]
 

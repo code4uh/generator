@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 
-from arraylayout.models import BoundaryDeviceSize, CapArraySpecModel, ResArraySpecModel
-from arraylayout.spec.validator import validate_spec
+from gridlayout.models import BoundaryDeviceSize, CapArraySpecModel, ResArraySpecModel
+from gridlayout.spec.validator import validate_spec
 
 ROOT = Path(__file__).resolve().parents[1]
 
