@@ -11,6 +11,7 @@ from .device import (
 )
 from ..spec.models.enums import BoundaryDeviceSize
 from ..classification.grid import GeneratedGridClassification
+from ..classification.placement import enumerate_positions
 from layout3d.types import LayoutInstance
 
 
@@ -30,9 +31,9 @@ def _boundary_side_for_position(*, x: int, y: int, max_x: int, max_y: int) -> st
     if x == max_x:
         return "right"
     if y == 0:
-        return "bottom"
-    if y == max_y:
         return "top"
+    if y == max_y:
+        return "bottom"
     return None
 
 
@@ -52,8 +53,8 @@ def _is_boundary_device(
     return (
         (bool(boundary["left"]) and x == 0)
         or (bool(boundary["right"]) and x == max_x)
-        or (bool(boundary["top"]) and y == max_y)
-        or (bool(boundary["bottom"]) and y == 0)
+        or (bool(boundary["top"]) and y == 0)
+        or (bool(boundary["bottom"]) and y == max_y)
     )
 
 
@@ -89,26 +90,7 @@ def _cap_core_group_map(spec: CapArraySpecModel) -> dict[tuple[int, int], int]:
     device_count = sum(cap_list)
     cols = max(1, math.ceil(device_count / rows))
 
-    if spec.placement.algorithm == "side-by-side":
-        positions = [(x, y) for y in range(rows) for x in range(cols)]
-    elif spec.placement.algorithm == "side-by-side-row-wise":
-        positions = [(x, y) for x in range(cols) for y in range(rows)]
-    elif spec.placement.algorithm == "common_centroid":
-        center_x = (cols - 1) / 2.0
-        center_y = (rows - 1) / 2.0
-        positions = [(x, y) for y in range(rows) for x in range(cols)]
-        positions.sort(
-            key=lambda p: (
-                abs(p[0] - center_x) + abs(p[1] - center_y),
-                (p[0] + p[1]) % 2,
-                abs(p[1] - center_y),
-                abs(p[0] - center_x),
-                p[1],
-                p[0],
-            )
-        )
-    else:
-        return mapping
+    positions = enumerate_positions(cols=cols, rows=rows, algorithm=spec.placement.algorithm)
 
     cursor = 0
     for group_idx, count in enumerate(cap_list):
@@ -169,7 +151,16 @@ def enrich_layout_semantics(
             )
             else "core"
         )
-        group_index = 0 if role == "boundary" else core_group_map.get((device.x, device.y), 1)
+        if role == "boundary":
+            group_index = 0
+        else:
+            core_coord = (device.x, device.y)
+            if core_coord not in core_group_map:
+                raise ValueError(
+                    "missing core group mapping for device "
+                    f"{device.device_id!r} at coordinate {core_coord}"
+                )
+            group_index = core_group_map[core_coord]
 
         boundary_side = None
         boundary_size = None
