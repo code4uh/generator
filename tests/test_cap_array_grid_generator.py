@@ -3,10 +3,10 @@ from pathlib import Path
 
 import pytest
 
-from arraylayout.classification.cap_array import CapArrayGridGenerator
-from arraylayout.models import CapArraySpecModel
-from arraylayout.classification.grid import iter_grid_coordinates
-from arraylayout.spec.parser import build_model
+from gridlayout.classification.cap_array import CapArrayGridGenerator
+from gridlayout.models import CapArraySpecModel
+from gridlayout.classification.grid import iter_grid_coordinates
+from gridlayout.spec.parser import build_model
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -191,3 +191,27 @@ def test_cap_grid_generator_tile_classification_is_deterministic() -> None:
     second = CapArrayGridGenerator().generate(to_cap_model(spec), layers=1)
 
     assert first.tiles == second.tiles
+
+
+def test_cap_grid_generator_boundary_top_uses_y_zero_and_bottom_uses_max_y() -> None:
+    spec = load_fixture("spec/fixtures/valid/cap_array_minimal.json")
+    spec["inputs"]["topology"]["cap_list"] = [1]
+    spec["inputs"]["placement"]["rows"] = 2
+    spec["inputs"]["placement"]["algorithm"] = "side-by-side"
+    spec["inputs"]["topology"]["boundary_caps"].update(
+        {"left": False, "right": False, "top": True, "bottom": False, "boundary_device_size": "unit"}
+    )
+    top_only = CapArrayGridGenerator().generate(to_cap_model(spec))
+
+    assert top_only.cells_y == 3
+    assert top_only.tile_kind_at(0, 0, 0) == "device"
+    assert top_only.tile_kind_at(0, 2, 0) == "wire"
+
+    spec["inputs"]["topology"]["boundary_caps"].update(
+        {"left": False, "right": False, "top": False, "bottom": True, "boundary_device_size": "unit"}
+    )
+    bottom_only = CapArrayGridGenerator().generate(to_cap_model(spec))
+
+    assert bottom_only.cells_y == 3
+    assert bottom_only.tile_kind_at(0, 0, 0) == "device"
+    assert bottom_only.tile_kind_at(0, 2, 0) == "device"

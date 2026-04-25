@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from arraylayout.debug.cli import main
+from gridlayout.debug.cli import main
 
 ROOT = Path(__file__).resolve().parents[1]
 

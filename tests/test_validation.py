@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from arraylayout.spec.validator import SpecValidationError, validate_spec
+from gridlayout.spec.validator import SpecValidationError, validate_spec
 
 ROOT = Path(__file__).resolve().parents[1]
 

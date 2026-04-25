@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from arraylayout.spec.netlist import generate_netlist
+from gridlayout.spec.netlist import generate_netlist
 
 ROOT = Path(__file__).resolve().parents[1]
 
